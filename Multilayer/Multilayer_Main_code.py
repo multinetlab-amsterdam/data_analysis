@@ -15,7 +15,6 @@ import multinetx as mx
 import networkx as nx
 import matplotlib.pyplot as plt
 
-import numpy as np
 import scipy as sio 
 import scipy.io
 from sklearn import preprocessing
@@ -29,28 +28,33 @@ from multiprocessing import Pool
 import pyreadstat
 import pandas as pd
 
-"This main code is able to create a Multilayer network from a Supra Adjacency Matrix - Those Matrices were made by Lucas - They are both MST and Weighted brain-networks" 
+"This main code used at MULTINETLAB for Multilayer Analysis - This code is able to create a Multilayer network object - similiar to the ones in Networkx - having as an input a Supra Adjacency Matrix"
+
+"For privacy reasons, we used random MST matrices on github " 
 
 
 # One should just change the value of (which is now  N=203) as the size of the matrix according to the demand
 
-"You should somehow include the matrices file here - The code is quite robust - It should work with any dataset - If It's prepared well - i. e. - The way Lucas did :-)"
+"The user should declare the supra matrices files in the beginning of the code - The code is quite robust - as long as the matrices are created using similar pipeline as the one in the Lab"
 
-# SOME SETTINGS - Choosing Layer Size and whether you wanna Weighted or Not
+####################
+# SOME SETTINGS!!!!!
+####################
 
+layer_size=197   # THis was our setting for BNA ATLAS - for AAL we did 75!
 
-#aal_rand_supra_weighted.mat
-#aal_supra_weighted_full.mat
+weighted=False # We are using MST's so the matrices are not weighted - if the matrices are weighted, we should say True!!!
 
-layer_size=75 # This are the numbers of nodes in the layer - before was 203
-#aal_supra_mst_full.mat
+#Should check which file I should put here!!!!
+# We now should include the file for the supra adjacency matrixed here!!!
 
-weighted=False
+# TRAINING RANDOM MATRIX
 
-#SHould check which file I should put here!!!!
+filename1='supra_randmst.mat'
 
-filename1='aal_supra_mst_full.mat'#'supra_MST_v2'#'supra_MST.mat' #14 layers including dwi
-filename2='aal_rand_supra_mst.mat'#'supra_MST_randomized.mat'
+# SOME NAMES USED IN THE LAB BEFORE!!!
+#filename1='aal_supra_mst_full.mat'#'supra_MST_v2'#'supra_MST.mat' #14 layers including dwi
+#filename2='aal_rand_supra_mst.mat'#'supra_MST_randomized.mat'
 #filename3='supra_weighted.mat'
 #filename1='supra_MST_full_203rois.mat'
 #filename1='supra_MST_first25.mat'
@@ -58,164 +62,146 @@ filename2='aal_rand_supra_mst.mat'#'supra_MST_randomized.mat'
 #filename4='supra_weighted_randomized.mat'
 
 
+#########################################
+#CREATING TAGS FOR THE LAYERS
+#########################################
 
-# These are the tags for the Multilayer Networks - the way Lucas prepared at the SupraAdjacency Matrix. 
+
+
+# Associating tags for each layer will be helpful for our coding. We used the ones bellow
+# These are the tags for the Multilayer Networks - It should match the with the layers in the SupraAdjacency Matrix. 
 print('0 = fmri, 1=pli delta, 2= pli theta, 3= pli alpha1, 4= pli alpha2, 5 = pli beta, 6 = pli gamma, 7 = DWI.') 
 
-"Loanding the matrices"
-#old tags
-#print('0 = fmri, 1=pli delta, 2= pli theta, 3= pli alpha1, 4= pli alpha2, 5 = pli beta, 6 = pli gamma, 7 = aec delta, 8 = aec theta,  9 =  aec alpha1, 10 = aec alpha2, 11 = aec beta, 12 = aec gamma, 13 = DWI.') 
-#"Loanding the matrices"
-#Old_tags
-#layer_tags=['0=fmri', '1=pli delta', '2= pli theta', '3= pli alpha1', '4= pli alpha2', '5 = pli beta', '6 = pli gamma', '7 = aec delta','8 = aec theta', '9 =  aec alpha1', '10 = aec alpha2', '11 = aec beta', '12 = aec gamma', '13 = DWI'] 
 
+#IMPROVEMENT!!! INCLUDE A FUNCTION TO CHECK THE TAGS FROM LUCAS FILES 
 
 layer_tags=['0=fmri', '1=pli delta', '2= pli theta', '3= pli alpha1', '4= pli alpha2', '5 = pli beta', '6 = pli gamma', '7 = DWI']
 just_tags=['fmri', 'pli_delta', 'pli_theta', 'pli_alpha1', 'pli_alpha2', 'pli_beta', 'pli_gamma', 'DWI'] 
 plot_tags=['fMRI', 'PLI delta', 'PLI theta', 'PLI alpha1', 'PLI alpha2', 'PLI beta', 'PLI gamma', 'DWI'] 
 
 
-#old_dic
-#Layer_dic={}
-#for i in range(0,14):
-#    Layer_dic[i]=just_tags[i]
-#print(Layer_dic)
+
 Layer_dic={}
 for i in range(0,len(just_tags)):
     Layer_dic[i]=just_tags[i]
 print(Layer_dic)
 
 
-    
+#############################################
+#LOADING THE MATRICES
+############################################# 
 
-#This is the Data in the functions!!! If I can create other data such as random, weighed, etc, I just need to run the special functions!!!!
+   
+
+#This is the real Data for all Multilayer functions!!! 
+# Notice that, from now on, every function received the data as input
+#If one create other data such as random, weighed, etc, you just need to include it here !!!!
+
+#THIS IS THE OBJECT YOU ARE GOING TO USE FOR THE REMMAINING OF THE CODE!!!!
 
 Supra_MST = scipy.io.loadmat(filename1)
-Supra_MST_random =scipy.io.loadmat(filename2)
+
+## OTHER DATA GENERATED ARE WRITTEN BELLOW
+
+#Supra_MST_random =scipy.io.loadmat(filename2)
 #Supra_weighted =scipy.io.loadmat(filename3)
 #Supra_weighted_random =scipy.io.loadmat(filename4)
 
+###IMPROVEMENT - INCLUDE VERBOSE TO MAKE CHECKS IN THE CODE!!!
 
 
-#Supra_Weighted=scipy.io.loadmat(filename2)
-print(type(Supra_MST)) #Shows that This is in fact a dicionary
+
+#######################
+#SANITY CHECK
+#######################
+
+#Check that this is in fact a dicionary
+print(type(Supra_MST))
+
 #print(type(Supra_Weighted)) #Shows that This is in fact a dicionary
 
-print(Supra_MST.keys())# The command bellow gives the keys
+print(Supra_MST.keys())
+
+# The command bellow gives the keys
 #print(Supra_Weighted.keys())# The command bellow gives the keys
 
 #multilayer=mat['aal_multilayer_adjmats']
 
 #def Create_Multilayer(Data):
-    
+  
+###IMPROVEMENT - make it independent of the layer size!!!
+  
 def Prepare_Multilayer(Data,list_of_layers):
-    #"for now should include Supra_MST or Supra_weighted as data and the list of layers you want"
-    # I can change for [-1] guy!!
-        name=list(Data.keys())[-1]
-        multilayer=Data[name]
+    """Converts the data to a Multinetx friendly object based in the inputed data.
+
+
+    Parameters
+    ----------
+    Data : A preloaded .mat  - Ex: Supra_MST
+    
+    
+    list_of_layers: a list of numbers corresponding to the Multilayer you want to create - 
+    Ex: If you want a Multilayer with fmri, pli_delta, pli theta, and pli beta using the tags: 0=fmri', '1=pli delta', '2= pli theta','5 = pli beta'
+    list_of_layers = [0,1,2,5]
+    
+    Returns
+    -------
+    out : list of layers.    
+
+    Note: This is convenient - since we can have a Database with all 14 layers, but we may want to study only a smaller number of layers. 
+    In short, the layers are based in the supra-adjacency matrices - but you can choose exactly the layers you want here"
+
+    """
+    
+    
+    #In the matlab file the element [-1] gives the matrices#
+    name=list(Data.keys())[-1]
+    multilayer=Data[name]
+    # Just checking if there are nan
         
-        #multilayer=Data['supra_final']
-        where_are_NaNs = np.isnan(multilayer)
-        multilayer[where_are_NaNs] = 0
-        #number_of_individuals=multilayer.shape[2]
-        #layer_numbers=13
-        #print(number_of_individuals)
-        #layer_numbers=13
-        #before it was 205 - make it automatic at some point
-        layer_size=75#197 # This are the numbers of nodes in the layer
-        N=layer_size
-        layer_list=list_of_layers
+    where_are_NaNs = np.isnan(multilayer)
+    multilayer[where_are_NaNs] = 0
+    layer_size=197#197 # This are the numbers of nodes in the layer
+    N=layer_size
+    layer_list=list_of_layers
 
-        layers=[]
-        for i in layer_list:
-            layers.append(multilayer[(i*N):(i+1)*N,(i*N):(i+1)*N,:])
-        return layers
-
-
-# Just cleaning the data - making nan to zero!!!
-# If one includes list(Supra_MST.keys())[-1] might work even not knowing the tag!!!
-
-
-#This was commented - mayibe need to uncomment
-
-#multilayer=Supra_MST[list(Supra_MST.keys())[-1]]
+    layers=[]
+    for i in layer_list:
+        layers.append(multilayer[(i*N):(i+1)*N,(i*N):(i+1)*N,:])
+    return layers
 
 
 
 
-#multilayer=Supra_MST['supra_final']
-
-#
-
-
-#where_are_NaNs = np.isnan(multilayer)
-#multilayer[where_are_NaNs] = 0
-
-
-#number_of_individuals=multilayer.shape[2]
-#print('The file has '+str(number_of_individuals)+ ' individuals')
-
-"The layers are based in the supra-adjacency matrices - just choose the layers here"
-
-#layer_list=[0,1,2,3,4,5,6,7,8,9,10,11,12]
-
-#
-#layer_list=[0,1,2,3,4]
-
-
-
-
- #Should be 13 here - but it does not converge quick
-# THis is the max num of layers
-
-
-
-
-#layer_numbers=13
-
-# Pay attention here could be changed
-
-
-#layer_size=203 # before was 205
-#N=layer_size
-#layers=[]
-#for i in layer_list:
-#    layers.append(multilayer[(i*N):(i+1)*N,(i*N):(i+1)*N,:])
-
-
-#def I_want_these_layers(layers_you_want):
-#    N=203 # before It was 205
-#    layers=[]
-#    for i in layers_you_want:
-#        layers.append(multilayer[(i*N):(i+1)*N,(i*N):(i+1)*N,:])
-    #layers
-#    return layers
-#for i in range(0,layer_numbers):
-#    layers.append(multilayer[(i*N):(i+1)*N,(i*N):(i+1)*N,:])
-    
-# check that, for Linda's data we have!!!
-#layer1=multilayer[0:78,0:78,:]
-#layer2=multilayer[78:2*78,78:2*78,:]
-#layer3=multilayer[2*78:3*78,2*78:3*78,:]
-
-
-
-# I Commented until here!!!!
-
-
-# This function is useful for the agregate - It is the missing step between networkx and Multilayer
-    
-def agregatte(multiple_layers_list, number_layers):
-    k, m = divmod(len(multiple_layers_list), number_layers)
-    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
-    return np.mean(temp, axis=0)
 
 "This creates a multilayer network for each individual"
 # This is the new one
 def multlayerG(individual,Data,list_of_single_layers):
+    """Creates a Multilayer Network for an individual, given the data, and a list of layers.
+
+    Parameters
+    ----------
+    
+    individual: integer from [0,S-1], where S is the size of the cohort.
+    
+    Data : A preloaded .mat  - Ex: Supra_MST
+    
+    
+    list_of_layers: a list of numbers corresponding to the Multilayer you want to create - 
+    Ex: If you want a Multilayer with fmri, pli_delta and pli theta, using the tags: 0=fmri', '1=pli delta', '2= pli theta'
+    list_of_layers = [0,1,2]
+    
+    Returns
+    -------
+    out : A Multilayer Object for a single individual in the Data.    
+
+   
+    """
+    
+    
     "Creates a multilayer for an individual i, knowing the number of layers, and the size of the layers"
     layers= Prepare_Multilayer(Data,list_of_single_layers)
-    N =75# 197 # before was 205
+    N =197# 197 # before was 205
     number_of_layers=len(list_of_single_layers)
     G=[]
     for j in range(0,len(list_of_single_layers)):
@@ -254,7 +240,15 @@ def multlayerG(individual,Data,list_of_single_layers):
     
 
     
-# Now we create the group eigenvector centrality for the whole group    
+# Now we create the group eigenvector centrality for the whole group  
+    
+
+# This function is useful for the agregate - It is the missing step between networkx and Multilayer
+    
+def agregatte(multiple_layers_list, number_layers):
+    k, m = divmod(len(multiple_layers_list), number_layers)
+    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
+    return np.mean(temp, axis=0)
 
 
 "Here comes all the functions - should do all that we made hypothesis - the way to create the functions is the same"
@@ -567,6 +561,8 @@ def Group_degree_centrality_std(Data,list_of_single_layers):
     return (Group_degree_centrality_std)
 " We need to create 90 metrics - 45 for the Multilayer and 45 for the random networks"
 
+
+#### IMPROVEMENT ALSO WITHIM
 def Mask_subnetwork(result,target):
     "If you say the target nodes for a given subnetwork, this command you return only the results of list associated with the target nodes"
     chunks = [result[x:x+layer_size] for x in range(0, len(result), layer_size)]
@@ -587,7 +583,7 @@ def SaveSPSS(Data,name,tag):
 def Function_output(function,Data,filename,colname,layers):
     # THis can be nany function we develeloped!
     temp=function(Data,layers)
-    FPN=list(range(0,75)) #THIS IS WITHOUT THE MASK - before 197
+    FPN=list(range(0,197)) #THIS IS WITHOUT THE MASK - before 197
     #FPN=[16,17,18,19,20,21,28,29,30,31,93,94,123,124,133,134,163,164]
     #old one - FPN=[16,17,18,19,20,21,28,29,30,31,93,94,129,130,139,140,169,170]
     temp_FPN=Mask_subnetwork(temp,FPN)
@@ -597,15 +593,15 @@ def Function_output(function,Data,filename,colname,layers):
 
 # Create a code - called Running Stuff - So that I can just run things based in this
 #Monolayer EC---------------- # Without Mask! Check function above!
-#for i in range(0,8):
-#    filename='TESTECAAL_No_Mask_Group_MST_Mono_layer_real_'+Layer_dic[i]+'_tag_'+str(i)
-#    colname='TESTECAAL_No_Mask_Group_MST_Mono_layer_real_'+Layer_dic[i]+'_tag_'+str(i)
-#    print(filename)
-#    print(colname)
-#    function=Group_eingenvector_centrality
-#    Data=Supra_MST
-#    Function_output(function,Data,filename,colname,[i])
-#    print('we did it')
+for i in range(0,8):
+    filename='Random_No_Mask_Group_MST_Mono_layer_real_'+Layer_dic[i]+'_tag_'+str(i)
+    colname='Rando,_No_Mask_Group_MST_Mono_layer_real_'+Layer_dic[i]+'_tag_'+str(i)
+    print(filename)
+    print(colname)
+    function=Group_eingenvector_centrality
+    Data=Supra_MST
+    Function_output(function,Data,filename,colname,[i])
+    print('we did it')
 
 
 

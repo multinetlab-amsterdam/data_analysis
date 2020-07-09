@@ -225,7 +225,7 @@ def multlayerG(individual,Data,list_of_single_layers):
             if i == j:
                 adj_block[i*N:  (i+1)*N,  j*N:(j+1)*N] = np.zeros(N)
             else:
-                adj_block[i*N:  (i+1)*N,  j*N:(j+1)*N] = np.identity(N)    # L_12
+                adj_block[i*N:  (i+1)*N,  j*N:(j+1)*N] = np.identity(N)    
 
     mg = mx.MultilayerGraph(list_of_layers=G,inter_adjacency_matrix=adj_block)
     mg.set_edges_weights(intra_layer_edges_weight=1,inter_layer_edges_weight=1)
@@ -234,9 +234,58 @@ def multlayerG(individual,Data,list_of_single_layers):
     
     return mg
 
+#############################
+#CREATING THE AGREGATTE
+#############################
+    
+#ATENTION: THERE ARE SEVERAL OPTIONS HERE - WE ARE USING A SIMILAR ONE DONE BY MUXVIS - THIS WILL BE AN INTERMEDIARE FUNCTION SO THAT THE OUTPUT OF THE OTHER FUNCTIONS COMES BACK PER NODE
+
+# This is the agregatte I suppose Muxviz is using - we double checked this Lucas
+
+def MVagregatte(multiple_layers_list, number_layers):
+    """Creates an agregatte output from a Multilayer Network Multilayer Network, given a multiple_layers_list and the number of layers
+    Parameters
+    ----------
+    
+    multiple_layers_list: 
+    
+    number_layers : 
+    
+    Returns
+    -------
+    out : An agregatte list wich is the mean of the values of a Network property per node in each layer
+   
+    """
+    k, m = divmod(len(multiple_layers_list), number_layers)
+    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
+    temp_mean=np.mean(temp,axis=0)
+    temp_mean=temp_mean/max(temp_mean)
+    #for sublists in temp:
+    #    m=np.max(temp[sublists])
+    #    for i in sublists:
+    #        temp[sublists][i]=temp[sublists][i]/m
+            
+    return temp_mean
+
+#def newagregatte(multiple_layers_list, number_layers):
+#    k, m = divmod(len(multiple_layers_list), number_layers)
+#    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
+    #for sublists in temp:
+        #m=np.max(temp[sublists])
+        #for i in sublists:
+            #temp[sublists][i]=temp[sublists][i]/m
+            
+#    return temp#np.mean(temp, axis=0)
+
+    
+#def agregatte(multiple_layers_list, number_layers):
+#    k, m = divmod(len(multiple_layers_list), number_layers)
+#    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
+#    return np.mean(temp, axis=0)
+
+
 
 #def multlayerG(individual,number_of_layers,list_of_layers):
-    "Creates a multilayer for an individual i, knowing the number of layers, and the size of the layers"
     
 
     
@@ -244,18 +293,39 @@ def multlayerG(individual,Data,list_of_single_layers):
     
 
 # This function is useful for the agregate - It is the missing step between networkx and Multilayer
-    
-def agregatte(multiple_layers_list, number_layers):
-    k, m = divmod(len(multiple_layers_list), number_layers)
-    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
-    return np.mean(temp, axis=0)
 
 
-"Here comes all the functions - should do all that we made hypothesis - the way to create the functions is the same"
+"Here comes all the functions - the strategy to create the functions are the same - we can parse all NetworkX functions here"
+
+
+
+#########################################
+#HERE COMES ALL THE MULTILAYER FUNCTIONS
+#########################################
+
+
+
     
 def Group_eingenvector_centrality(Data,list_of_single_layers):
+    
+    """Returns a flat list with the agregatte output for EC, given a Data, and a list_of_single_layers
+    
+    Parameters
+    ----------
+    Data : A preloaded .mat  - Ex: Supra_MST
+    
+    
+    list_of_layers: a list of numbers corresponding to the Multilayer you want to create - 
+    Ex: If you want a Multilayer with fmri, pli_delta, pli theta, and pli beta using the tags: 0=fmri', '1=pli delta', '2= pli theta','5 = pli beta'
+    list_of_layers = [0,1,2,5]
+    
+    Returns
+    -------
+    out : An agregatte list wich is the mean of the values of a the EC per node in each layer
+   
+    """
 
-    "This list will save all the eigenvector centralities for all individuals"
+    "This list will save all the eigenvector centralities for all individuals in all layers"
     name=list(Data.keys())[-1]
 
     number_of_individuals=Data[name].shape[2]
@@ -404,12 +474,33 @@ def Group_eingenvector_centrality_std(Data,list_of_single_layers):
     return (Group_eingenvector_std)
 
 
-
+###############################
+#SOME PLOTING FUNCTIONS FOR EC   
+###############################
 #"This are functions to plot the previous functions"
 
 
-def Group_hist(Data,list_of_single_layers):
-    "this functions aims to plot a histogram with the values of the Eigenvalue centrality for all nodes across all individuals"
+def Plot_Group_EC(Data,list_of_single_layers):
+    """This function plots a histogram with the values of the Eigenvalue centrality for all nodes across all individuals"
+
+    Parameters
+    ----------
+        
+    Data : A preloaded .mat  - Ex: Supra_MST
+    
+    
+    list_of_layers: a list of numbers corresponding to the Multilayer you want to create - 
+    Ex: If you want a Multilayer with fmri, pli_delta and pli theta, using the tags: 0=fmri', '1=pli delta', '2= pli theta'
+    list_of_layers = [0,1,2]
+    
+    Returns
+    -------
+    out : A histogram with EC for all nodes across all individuals
+   
+    """
+    
+    
+    
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
 
     temp=Group_eingenvector_centrality(Data,list_of_single_layers)
@@ -424,10 +515,28 @@ def Group_hist(Data,list_of_single_layers):
 #plt.title('individual '+str(individual))
     plt.show()
 
-## Include layer tag here! 
-## In the end I want to plot all histograms for different twelve layers - the compute the distances and make a matrix
 
-def Plot_eingenvectorcentrality(individual,Data,list_of_single_layers):
+def Plot_EC(individual,Data,list_of_single_layers):
+    """This function plots a histogram with the values of the Eigenvalue centrality for all nodes one individual"
+
+    Parameters
+    ----------
+    individual: integer from [0,S-1], where S is the size of the cohort.
+
+        
+    Data : A preloaded .mat  - Ex: Supra_MST
+    
+    
+    list_of_layers: a list of numbers corresponding to the Multilayer you want to create - 
+    Ex: If you want a Multilayer with fmri, pli_delta and pli theta, using the tags: 0=fmri', '1=pli delta', '2= pli theta'
+    list_of_layers = [0,1,2]
+    
+    Returns
+    -------
+    out : A histogram with EC for one individuals
+   
+    """
+    
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
     #multlayerG(individual,Data,list_of_single_layers)
     m=mx.eigenvector_centrality_numpy(multlayerG(individual,Data,list_of_single_layers))
@@ -437,27 +546,7 @@ def Plot_eingenvectorcentrality(individual,Data,list_of_single_layers):
     # This is the Mux Viz Agregatte - We change the agregatte here if yo want later
     #temp2=agregatte(temp1,len(list_of_single_layers))
     plt.hist((temp2))
-    # We can edit here the output if we have a vector with the name of the layers
-    plt.xlabel('Eigenvector centrality - aggregate ',fontsize=20)
-    #plt.xlim(-5,220)
-    plt.ylabel("frequence",fontsize=20)
-    plt.title('individual '+str(individual))
-    plt.show()
-    return
-
-
-
-def Plot_eingenvectorcentrality_new(individual,Data,list_of_single_layers):
-    print('layers =',[layer_tags[i] for i in list_of_single_layers])
-    #multlayerG(individual,Data,list_of_single_layers)
-    m=mx.eigenvector_centrality_numpy(multlayerG(individual,Data,list_of_single_layers))
-    #temp=multlayer3(i)
-    temp1=list(m.values())
-    temp2=MVagregatte(temp1, len(list_of_single_layers)) 
-    # This is the Mux Viz Agregatte - We change the agregatte here if yo want later
-    #temp2=agregatte(temp1,len(list_of_single_layers))
-    plt.hist((temp2))
-    # We can edit here the output if we have a vector with the name of the layers
+    ###IMPROVEMENT: We can edit here the output if we have a vector with the name of the layers
     plt.xlabel('Eigenvector centrality - aggregate ',fontsize=20)
     #plt.xlim(-5,220)
     plt.ylabel("frequence",fontsize=20)
@@ -465,30 +554,10 @@ def Plot_eingenvectorcentrality_new(individual,Data,list_of_single_layers):
     plt.title('individual '+str(individual))
     plt.show()
     return
+    
 
-def newagregatte(multiple_layers_list, number_layers):
-    k, m = divmod(len(multiple_layers_list), number_layers)
-    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
-    #for sublists in temp:
-        #m=np.max(temp[sublists])
-        #for i in sublists:
-            #temp[sublists][i]=temp[sublists][i]/m
-            
-    return temp#np.mean(temp, axis=0)
 
-# This is the agregatte I suppose Muxviz is using - Double Check with Lucas
 
-def MVagregatte(multiple_layers_list, number_layers):
-    k, m = divmod(len(multiple_layers_list), number_layers)
-    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
-    temp_mean=np.mean(temp,axis=0)
-    temp_mean=temp_mean/max(temp_mean)
-    #for sublists in temp:
-    #    m=np.max(temp[sublists])
-    #    for i in sublists:
-    #        temp[sublists][i]=temp[sublists][i]/m
-            
-    return temp_mean
             
 
 #
@@ -591,17 +660,27 @@ def Function_output(function,Data,filename,colname,layers):
     
     return
 
+
+
+
+##########################################################
+# HERE ARE NEARLY ALL THE RUNNING ANALYSIS I DID FOR LUCAS
+##########################################################
+
 # Create a code - called Running Stuff - So that I can just run things based in this
 #Monolayer EC---------------- # Without Mask! Check function above!
-for i in range(0,8):
-    filename='Random_No_Mask_Group_MST_Mono_layer_real_'+Layer_dic[i]+'_tag_'+str(i)
-    colname='Rando,_No_Mask_Group_MST_Mono_layer_real_'+Layer_dic[i]+'_tag_'+str(i)
-    print(filename)
-    print(colname)
-    function=Group_eingenvector_centrality
-    Data=Supra_MST
-    Function_output(function,Data,filename,colname,[i])
-    print('we did it')
+#for i in range(0,8):
+#    filename='Random_No_Mask_Group_MST_Mono_layer_real_'+Layer_dic[i]+'_tag_'+str(i)
+#    colname='Rando,_No_Mask_Group_MST_Mono_layer_real_'+Layer_dic[i]+'_tag_'+str(i)
+#    print(filename)
+#    print(colname)
+#    function=Group_eingenvector_centrality
+#    Data=Supra_MST
+#    Function_output(function,Data,filename,colname,[i])
+#    print('we did it')
+
+
+
 
 
 

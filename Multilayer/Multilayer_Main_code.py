@@ -347,6 +347,29 @@ def Group_eingenvector_centrality(Data,list_of_single_layers):
         
     return flat_list
 
+def Group_clustering(Data,list_of_single_layers):
+    "This list will save all the clustering for all individuals"
+    name=list(Data.keys())[-1]
+
+    number_of_individuals=Data[name].shape[2]
+
+    Group_clustering=[]
+    for individual in range(number_of_individuals):
+        temp=multlayerG(individual,Data,list_of_single_layers)
+
+        m=mx.clustering(temp)
+        #m=mx.eigenvector_centrality(multlayerG(individual,number_of_layers,list_of_layers))
+    #temp=multlayer3(i)
+        temp1=list(m.values())
+        temp2=MVagregatte(temp1, len(list_of_single_layers)) 
+        #temp2=agregatte(temp1,len(list_of_single_layers))
+        # This is a list of lists with all centralities for all individuals
+        Group_clustering.append(temp2)
+        # since we want to buid a flat list 
+    # Check this flattened = [val for sublist in list_of_lists for val in sublist]
+    flat_list = [item for sublist in Group_clustering for item in sublist]
+        
+    return flat_list
 
 
    
@@ -746,15 +769,29 @@ def Function_output(function,Data,filename,colname,layers):
     
 #___________________________________________________________
     #-------------------
-#MULTILAYER Degree Centrality
-filename='Degree_cent_no_mask_Group_MST_Multi_layer_real_'#+Layer_dic[i]+'_tag_'+str(i)
-colname='Degree_cent_no_mask_Group_MST_Multi_layer_real_'#+Layer_dic[i]+'_tag_'+str(i)
+    
+#MULTILAYER clustering
+filename='Clustering_no_mask_Group_MST_Multi_layer_real_'#+Layer_dic[i]+'_tag_'+str(i)
+colname='Clustering_no_mask_Group_MST_Multi_layer_real_'#+Layer_dic[i]+'_tag_'+str(i)
 print(filename)
 print(colname)
-function=Group_degree_centrality
+function=Group_clustering
 Data=Supra_MST
 Function_output(function,Data,filename,colname,list(range(8)))
 print('we did it')
+#------------------------------------------------------------
+    
+    
+
+#MULTILAYER Degree Centrality
+#filename='Degree_cent_no_mask_Group_MST_Multi_layer_real_'#+Layer_dic[i]+'_tag_'+str(i)
+#colname='Degree_cent_no_mask_Group_MST_Multi_layer_real_'#+Layer_dic[i]+'_tag_'+str(i)
+#print(filename)
+#print(colname)
+#function=Group_degree_centrality
+#Data=Supra_MST
+#Function_output(function,Data,filename,colname,list(range(8)))
+#print('we did it')
 #------------------------------------------------------------
 
 

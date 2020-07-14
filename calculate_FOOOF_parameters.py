@@ -7,18 +7,21 @@ Created on Fri May 29 15:04:02 2020
 """
 # reviewed by Linda Douw 20200603
 # updated by Tianne Numan 20200604
+# reviewed by Eduarda Centeno 20200714
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
 from scipy import signal
 import pandas as pd
 from fooof import FOOOF
+import os
+
+niceValue = os.nice(19)
 
 def cal_power_spectrum (timeseries, rois, fs, window='hamming', nperseg=4096, scaling='spectrum', plot_figure=False, title_plot='average power spectrum'):
     pxx = np.empty([int(nperseg/2+1), len(rois)])
     for roi in rois:
-        (f, pxx[:,roi]) = scipy.signal.welch(timeseries[roi].values, fs, window, nperseg, scaling=scaling)
+        (f, pxx[:,roi]) = signal.welch(timeseries[roi].values, fs, window, nperseg, scaling=scaling)
     if plot_figure==True:
         plt.figure()
         plt.plot(f, np.mean(pxx,1), color='teal')
@@ -44,12 +47,12 @@ def cal_FOOOF_parameters(pxx, f, rois=210, freq_range=[0.5, 48]):
     FOOOF_offset = np.empty(rois)
     FOOOF_slope = np.empty(rois)
     # loop over all rois 
-    for roi in list(range(rois)):
-            # model the power spectrum with FOOOF for each roi in rois
-            # LD: this part does not run because the size of the freqs var is somehow not consistent
-            fm.fit(f, pxx[:,roi], freq_range)
-            FOOOF_offset[roi] = fm.background_params_[0]
-            FOOOF_slope[roi] = fm.background_params_[1]
+    for roi in np.arange(rois):
+        # model the power spectrum with FOOOF for each roi in rois
+        # LD: this part does not run because the size of the freqs var is somehow not consistent
+        fm.fit(f, pxx[:,roi], freq_range)
+        FOOOF_offset[roi] = fm.background_params_[0]
+        FOOOF_slope[roi] = fm.background_params_[1]
     
     return FOOOF_offset, FOOOF_slope
 

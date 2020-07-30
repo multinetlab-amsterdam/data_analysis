@@ -306,7 +306,7 @@ def MVaggregate(multiple_layers_list, number_layers):
 
 
     
-def Group_eingenvector_centrality(Data,list_of_single_layers):
+def Group_eigenvector_centrality(Data,list_of_single_layers):
     
     """Returns a flat list with the aggregate output for EC, given a Data, and a list_of_single_layers
     
@@ -330,7 +330,7 @@ def Group_eingenvector_centrality(Data,list_of_single_layers):
 
     number_of_individuals=Data[name].shape[2]
 
-    Group_eingenvector=[]
+    Group_eigenvector=[]
     for individual in range(number_of_individuals):
         temp=multlayerG(individual,Data,list_of_single_layers)
 
@@ -341,14 +341,34 @@ def Group_eingenvector_centrality(Data,list_of_single_layers):
         temp2=MVaggregate(temp1, len(list_of_single_layers)) 
         #temp2=aggregate(temp1,len(list_of_single_layers))
         # This is a list of lists with all centralities for all individuals
-        Group_eingenvector.append(temp2)
+        Group_eigenvector.append(temp2)
         # since we want to buid a flat list 
-    flat_list = [item for sublist in Group_eingenvector for item in sublist]
+    flat_list = [item for sublist in Group_eigenvector for item in sublist]
         
     return flat_list
 
 def Group_clustering(Data,list_of_single_layers):
-    "This list will save all the clustering for all individuals"
+     """Returns a flat list with the aggregate output for Group clustering, given a Data, and a list_of_single_layers
+    
+    Parameters
+    ----------
+    Data : A preloaded .mat  - Ex: Supra_MST
+    
+    
+    list_of_layers: a list of numbers corresponding to the Multilayer you want to create - 
+    Ex: If you want a Multilayer with fmri, pli_delta, pli theta, and pli beta using the tags: 0=fmri', '1=pli delta', '2= pli theta','5 = pli beta'
+    list_of_layers = [0,1,2,5]
+    
+    Returns
+    -------
+    out: An aggregate list which is the mean of the values of the Clustering per node in each layer
+   
+    """
+
+    
+    
+    
+    
     name=list(Data.keys())[-1]
 
     number_of_individuals=Data[name].shape[2]
@@ -476,14 +496,14 @@ def Group_bet_centrality(Data,list_of_single_layers):
 
 "Here comes the mean and standard deviations from all metrics we analized"
     
-def Group_eingenvector_centrality_mean(Data,list_of_single_layers):
+def Group_eigenvector_centrality_mean(Data,list_of_single_layers):
     #m=multlayerGNew(3,Supra_MST,[0,5,1])
     "This list will save all the eigenvector centralities means for all individuals"
     name=list(Data.keys())[-1]
 
     number_of_individuals=Data[name].shape[2]
 
-    Group_eingenvector_mean=[]
+    Group_eigenvector_mean=[]
     for individual in range(number_of_individuals):
         temp=multlayerG(individual,Data,list_of_single_layers)
 
@@ -494,20 +514,20 @@ def Group_eingenvector_centrality_mean(Data,list_of_single_layers):
         temp2=MVaggregate(temp1, len(list_of_single_layers)) 
         #temp2=aggregate(temp1,len(list_of_single_layers))
         
-        Group_eingenvector_mean.append(np.mean(temp2))
+        Group_eigenvector_mean.append(np.mean(temp2))
         
-    return (Group_eingenvector_mean)
+    return (Group_eigenvector_mean)
 
 
 
 
 
-def Group_eingenvector_centrality_std(Data,list_of_single_layers):
+def Group_eigenvector_centrality_std(Data,list_of_single_layers):
     "This list will save all the eigenvector centralities stds for all individuals"
     name=list(Data.keys())[-1]
 
     number_of_individuals=Data[name].shape[2]
-    Group_eingenvector_std=[]
+    Group_eigenvector_std=[]
     for individual in range(number_of_individuals):
         temp=multlayerG(individual,Data,list_of_single_layers)
         m=mx.eigenvector_centrality_numpy(temp)
@@ -517,9 +537,9 @@ def Group_eingenvector_centrality_std(Data,list_of_single_layers):
         temp2=MVaggregate(temp1, len(list_of_single_layers)) # This is MV aggregate - we can change then later for something else
         #temp2=aggregate(temp1,len(list_of_single_layers))
         
-        Group_eingenvector_std.append(np.std(temp2))
+        Group_eigenvector_std.append(np.std(temp2))
         
-    return (Group_eingenvector_std)
+    return (Group_eigenvector_std)
 
 
 ###############################
@@ -551,7 +571,7 @@ def Plot_Group_EC(Data,list_of_single_layers):
     
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
 
-    temp=Group_eingenvector_centrality(Data,list_of_single_layers)
+    temp=Group_eigenvector_centrality(Data,list_of_single_layers)
     plt.figure(figsize=(8,5))
     plt.hist(temp)
     # We can edit here the output if we have a vector with the name of the layers
@@ -622,7 +642,7 @@ def Plot_EC(individual,Data,list_of_single_layers):
 
 
 
-def eingenvectorcentrality(individual,Data,list_of_single_layers):
+def eigenvectorcentrality(individual,Data,list_of_single_layers):
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
     #multlayerG(individual,Data,list_of_single_layers)
     m=mx.eigenvector_centrality_numpy(multlayerG(individual,Data,list_of_single_layers))
@@ -723,7 +743,7 @@ def Function_output(function,Data,filename,colname,layers):
 #    colname='Rando,_No_Mask_Group_MST_Mono_layer_real_'+Layer_dic[i]+'_tag_'+str(i)
 #    print(filename)
 #    print(colname)
-#    function=Group_eingenvector_centrality
+#    function=Group_eigenvector_centrality
 #    Data=Supra_MST
 #    Function_output(function,Data,filename,colname,[i])
 #    print('we did it')
@@ -739,7 +759,7 @@ def Function_output(function,Data,filename,colname,layers):
 #    colname='EC_No_Mask_Group_MST_Mono_layer_random_'+Layer_dic[i]+'_tag_'+str(i)
 #    print(filename)
 #    print(colname)
-#    function=Group_eingenvector_centrality
+#    function=Group_eigenvector_centrality
 #    Data=Supra_MST_random
 #    Function_output(function,Data,filename,colname,[i])
 #    print('we did it')
@@ -751,7 +771,7 @@ def Function_output(function,Data,filename,colname,layers):
 #colname='EC_No_Mask_Group_MST_Multi_layer_real_'#+Layer_dic[i]+'_tag_'+str(i)
 #print(filename)
 #print(colname)
-#function=Group_eingenvector_centrality
+#function=Group_eigenvector_centrality
 #Data=Supra_MST
 #Function_output(function,Data,filename,colname,list(range(8)))
 #print('we did it')
@@ -762,7 +782,7 @@ def Function_output(function,Data,filename,colname,layers):
 #colname='EC_No_Mask_Group_MST_Multi_layer_random_'#+Layer_dic[i]+'_tag_'+str(i)
 #print(filename)
 #print(colname)
-#function=Group_eingenvector_centrality
+#function=Group_eigenvector_centrality
 #Data=Supra_MST_random
 #Function_output(function,Data,filename,colname,list(range(8)))
 #print('we did it')

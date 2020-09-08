@@ -1,56 +1,70 @@
 
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+"""This is the main code used at the MULTINETLAB for Multilayer Analysis.
+
+   This code can create a Multilayer network object - similar to the ones in Networkx 
+   It has as an input a Supra Adjacency Matrix. 
+
+   For privacy reasons, we provide a random MST file.
+
 """
-Created on Tue Oct 15 11:31:56 2019
 
-@author: Turing
-"""
+__author__ = "Fernando Nobrega"
+__contact__ = "f.nobregasantos@amsterdamumc.nl"
+__date__ = "2019/10/15"
+__status__ = "Production"
 
-"importing important stuff."
 
-""
-import numpy as np
+####################
+# Review History   #
+####################
+
+# Reviewed by Eduarda Centeno 20200909
+
+
+####################
+# Libraries        #
+####################
+
+# Standard imports
+import itertools
+from multiprocessing import Pool
+import time as time
+
+# Third party imports
+import matplotlib.pyplot as plt
 import multinetx as mx
 import networkx as nx
-import matplotlib.pyplot as plt
-
+import numpy as np
+import pandas as pd
+from pylab import pcolor, show, colorbar, xticks, yticks
+import pyreadstat
 import scipy as sio 
 import scipy.io
 from sklearn import preprocessing
-from pylab import pcolor, show, colorbar, xticks, yticks
-import networkx as nx
-import matplotlib.pyplot as plt
-import itertools
-from sklearn.preprocessing import MinMaxScaler
-import time as time
-from multiprocessing import Pool
-import pyreadstat
-import pandas as pd
-
-"This main code used at MULTINETLAB for Multilayer Analysis - This code can create a Multilayer network object - similar to the ones in Networkx - having as an input a Supra Adjacency Matrix."
-
-"For privacy reasons, we used random MST matrices on Github " 
+from sklearn.preprocessing import MinMaxScaler 
 
 
 # One should just change the value of (which is now  N=203) as the size of the matrix according to the demand
 
-"The user should declare the supra matrices files in the beginning of the code - The code is quite robust - as long as the matrices are created using a similar pipeline as the one in the Lab."
+""" The user should declare the supra matrices files in the beginning of the code - The code is quite robust - 
+as long as the matrices are created using a similar pipeline as the one in the Lab."""
 
 ####################
-# SOME SETTINGS!!!!!
+# SETTINGS         #
 ####################
 
-layer_size=197   # THis was our setting for BNA ATLAS - for AAL we did 75!
+layer_size = 197   # This was our setting for BNA ATLAS - for AAL we did 75!
 
-weighted=False # We are using MST's so the matrices are not weighted - if the matrices are weighted, we should say True!!!
+weighted = False # We are using MSTs. Thus, the matrices are not weighted - if weighted, we should change it to True
 
-#Should check which file I should put here!!!!
+# Should check which file I should put here!!!!
 # We now should include the file for the supra adjacency matrixed here!!!
 
 # TRAINING RANDOM MATRIX
-
-filename1='supra_randmst.mat'
+filename1 = 'supra_randmst.mat'
 
 # SOME NAMES USED IN THE LAB BEFORE!!!
 #filename1='aal_supra_mst_full.mat'#'supra_MST_v2'#'supra_MST.mat' #14 layers including dwi
@@ -63,41 +77,38 @@ filename1='supra_randmst.mat'
 
 
 #########################################
-#CREATING TAGS FOR THE LAYERS
+# CREATING LAYER TAGS                   #
 #########################################
 
 
-
-# Associating tags for each layer will be helpful for our coding. We used one's bellow
-# These are the tags for the Multilayer Networks - It should match the with the layers in the SupraAdjacency Matrix. 
-print('0 = fmri, 1=pli delta, 2= pli theta, 3= pli alpha1, 4= pli alpha2, 5 = pli beta, 6 = pli gamma, 7 = DWI.') 
+# Associating tags for each layer will be helpful for our coding. We used the ones below.
+# These are the tags for the Multilayer Networks - It should match the with the layers in the Supra Adjacency Matrix. 
+print('0 = fmri, 1 = pli delta, 2 = pli theta, 3 = pli alpha1, 4 = pli alpha2, 5 = pli beta, 6 = pli gamma, 7 = DWI .') 
 
 
 #IMPROVEMENT!!! INCLUDE A FUNCTION TO CHECK THE TAGS FROM LUCAS FILES 
 
-layer_tags=['0=fmri', '1=pli delta', '2= pli theta', '3= pli alpha1', '4= pli alpha2', '5 = pli beta', '6 = pli gamma', '7 = DWI']
+layer_tags=['0 = fmri', '1 = pli delta', '2 = pli theta', '3 = pli alpha1', '4 = pli alpha2', '5 = pli beta', '6 = pli gamma', '7 = DWI']
 just_tags=['fmri', 'pli_delta', 'pli_theta', 'pli_alpha1', 'pli_alpha2', 'pli_beta', 'pli_gamma', 'DWI'] 
 plot_tags=['fMRI', 'PLI delta', 'PLI theta', 'PLI alpha1', 'PLI alpha2', 'PLI beta', 'PLI gamma', 'DWI'] 
 
 
 
-Layer_dic={}
-for i in range(0,len(just_tags)):
-    Layer_dic[i]=just_tags[i]
+Layer_dic = {}
+for i in range(0 , len(just_tags)):
+    Layer_dic[i] = just_tags[i]
 print(Layer_dic)
 
 
 #############################################
-#LOADING THE MATRICES
+# LOADING THE MATRICES                      #
 ############################################# 
 
-   
-
-#This is the real Data for all Multilayer functions!!! 
+# This is the real data for all Multilayer functions!!! 
 # Notice that, from now on, every function received the data as input
-#If one create other data such as random, weighed, etc, you just need to include it here !!!!
+# If one create other data such as random, weighed, etc, you just need to include it here !!!!
 
-#THIS IS THE OBJECT YOU ARE GOING TO USE FOR THE REMMAINING OF THE CODE!!!!
+# THIS IS THE OBJECT YOU ARE GOING TO USE FOR THE REMAINING OF THE CODE!!!!
 
 Supra_MST = scipy.io.loadmat(filename1)
 
@@ -112,7 +123,7 @@ Supra_MST = scipy.io.loadmat(filename1)
 
 
 #######################
-#SANITY CHECK
+# SANITY CHECK        #
 #######################
 
 #Check that this is in fact a dicionary
@@ -154,16 +165,16 @@ def Prepare_Multilayer(Data,list_of_layers):
     """
     
     
-    #In the matlab file the element [-1] gives the matrices#
-    name=list(Data.keys())[-1]
-    multilayer=Data[name]
-    # Just checking if there are nan
-        
+    #In the matlab file the element [-1] gives the matrices
+    name = list(Data.keys())[-1]
+    multilayer = Data[name]
+
+    # Just checking if there are NaNs
     where_are_NaNs = np.isnan(multilayer)
     multilayer[where_are_NaNs] = 0
-    layer_size=197#197 # This are the numbers of nodes in the layer
-    N=layer_size
-    layer_list=list_of_layers
+    layer_size = 197 # This are the numbers of nodes in the layer
+    N = layer_size
+    layer_list = list_of_layers
 
     layers=[]
     for i in layer_list:
@@ -171,12 +182,8 @@ def Prepare_Multilayer(Data,list_of_layers):
     return layers
 
 
-
-
-
-"This creates a multilayer network for each individual"
-# This is the new one
-def multlayerG(individual,Data,list_of_single_layers):
+# This creates a multilayer network for each individual (This is the new one)
+def multlayerG(individual, Data, list_of_single_layers):
     """Creates a Multilayer Network for an individual, given the data, and a list of layers.
 
     Parameters
@@ -200,8 +207,8 @@ def multlayerG(individual,Data,list_of_single_layers):
     
     
     "Creates a multilayer for an individual i, knowing the number of layers, and the size of the layers"
-    layers= Prepare_Multilayer(Data,list_of_single_layers)
-    N =197# 197 # before was 205
+    layers= Prepare_Multilayer(Data, list_of_single_layers)
+    N =197 # before was 205
     number_of_layers=len(list_of_single_layers)
     G=[]
     for j in range(0,len(list_of_single_layers)):
@@ -210,14 +217,12 @@ def multlayerG(individual,Data,list_of_single_layers):
     
         
     
+# Define the type of interconnection between the layers
 
-#Define the type of interconnection between the layers
-#"N is the size of the layer""
+# This creates the supra adjacency matrix
+    adj_block = mx.lil_matrix(np.zeros((N*number_of_layers,N*number_of_layers))) # N is the size of the layer
 
-# This creates the supra adjacency matrix"
-    adj_block = mx.lil_matrix(np.zeros((N*number_of_layers,N*number_of_layers)))
-
-#Need to create generic adjacency blocks!!!!
+# Need to create generic adjacency blocks!!!!
 
 # These are generic interconnection blocks!!!   
     for i in range(number_of_layers):
@@ -234,11 +239,13 @@ def multlayerG(individual,Data,list_of_single_layers):
     
     return mg
 
+
 #############################
-#CREATING THE AGGREGATE
+# CREATING THE AGGREGATE    #
 #############################
     
-#ATENTION: THERE ARE SEVERAL OPTIONS HERE - WE ARE USING A SIMILAR ONE DONE BY MUXVIS - THIS WILL BE AN INTERMEDIATE FUNCTION SO THAT THE OUTPUT OF THE OTHER FUNCTIONS COMES BACK PER NODE
+# ATENTION: THERE ARE SEVERAL OPTIONS HERE - WE ARE USING A SIMILAR ONE DONE BY MUXVIS - 
+# THIS WILL BE AN INTERMEDIATE FUNCTION SO THAT THE OUTPUT OF THE OTHER FUNCTIONS COMES BACK PER NODE
 
 # This is the aggregate I suppose Muxviz is using - we double-checked this (with Lucas)
 
@@ -257,9 +264,9 @@ def MVaggregate(multiple_layers_list, number_layers):
    
     """
     k, m = divmod(len(multiple_layers_list), number_layers)
-    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
-    temp_mean=np.mean(temp,axis=0)
-    temp_mean=temp_mean/max(temp_mean)
+    temp = list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
+    temp_mean = np.mean(temp,axis=0)
+    temp_mean = temp_mean/max(temp_mean)
     #for sublists in temp:
     #    m=np.max(temp[sublists])
     #    for i in sublists:
@@ -295,18 +302,14 @@ def MVaggregate(multiple_layers_list, number_layers):
 # This function is useful for the aggregate - It is the missing step between networkx and Multilayer
 
 
-"Here come all the functions - the strategy to create the functions are the same - we can parse all NetworkX functions here."
-
-
-
-#########################################
-#HERE COMES ALL THE MULTILAYER FUNCTIONS
-#########################################
-
-
+###########################################################
+# HERE COMES ALL THE MULTILAYER FUNCTIONS                 #
+# The strategy to create the functions are the same,      #
+# we can parse all NetworkX functions here.               #
+###########################################################
 
     
-def Group_eigenvector_centrality(Data,list_of_single_layers):
+def Group_eigenvector_centrality(Data, list_of_single_layers):
     
     """Returns a flat list with the aggregate output for EC, given a Data, and a list_of_single_layers
     
@@ -326,19 +329,18 @@ def Group_eigenvector_centrality(Data,list_of_single_layers):
     """
 
     "This list will save all the eigenvector centralities for all individuals in all layers."
-    name=list(Data.keys())[-1]
+    name = list(Data.keys())[-1]
 
-    number_of_individuals=Data[name].shape[2]
+    number_of_individuals = Data[name].shape[2]
 
-    Group_eigenvector=[]
+    Group_eigenvector = []
     for individual in range(number_of_individuals):
-        temp=multlayerG(individual,Data,list_of_single_layers)
+        temp = multlayerG(individual,Data,list_of_single_layers)
 
-        m=mx.eigenvector_centrality_numpy(temp)
+        m = mx.eigenvector_centrality_numpy(temp)
         #m=mx.eigenvector_centrality(multlayerG(individual,number_of_layers,list_of_layers))
-    #temp=multlayer3(i)
-        temp1=list(m.values())
-        temp2=MVaggregate(temp1, len(list_of_single_layers)) 
+        temp1 = list(m.values())
+        temp2 = MVaggregate(temp1, len(list_of_single_layers)) 
         #temp2=aggregate(temp1,len(list_of_single_layers))
         # This is a list of lists with all centralities for all individuals
         Group_eigenvector.append(temp2)
@@ -347,8 +349,8 @@ def Group_eigenvector_centrality(Data,list_of_single_layers):
         
     return flat_list
 
-def Group_clustering(Data,list_of_single_layers):
-     """Returns a flat list with the aggregate output for Group clustering, given a Data, and a list_of_single_layers
+def Group_clustering(Data, list_of_single_layers):
+    """Returns a flat list with the aggregate output for Group clustering, given a Data, and a list_of_single_layers
     
     Parameters
     ----------
@@ -356,7 +358,8 @@ def Group_clustering(Data,list_of_single_layers):
     
     
     list_of_layers: a list of numbers corresponding to the Multilayer you want to create - 
-    Ex: If you want a Multilayer with fmri, pli_delta, pli theta, and pli beta using the tags: 0=fmri', '1=pli delta', '2= pli theta','5 = pli beta'
+    Ex: If you want a Multilayer with fmri, pli_delta, pli theta, and pli beta using the tags: 0=fmri', '1=pli delta', 
+    '2= pli theta','5 = pli beta'
     list_of_layers = [0,1,2,5]
     
     Returns
@@ -364,24 +367,19 @@ def Group_clustering(Data,list_of_single_layers):
     out: An aggregate list which is the mean of the values of the Clustering per node in each layer
    
     """
+    
+    name = list(Data.keys())[-1]
 
-    
-    
-    
-    
-    name=list(Data.keys())[-1]
+    number_of_individuals = Data[name].shape[2]
 
-    number_of_individuals=Data[name].shape[2]
-
-    Group_clustering=[]
+    Group_clustering = []
     for individual in range(number_of_individuals):
-        temp=multlayerG(individual,Data,list_of_single_layers)
+        temp = multlayerG(individual, Data, list_of_single_layers)
 
-        m=mx.clustering(temp)
+        m = mx.clustering(temp)
         #m=mx.eigenvector_centrality(multlayerG(individual,number_of_layers,list_of_layers))
-    #temp=multlayer3(i)
-        temp1=list(m.values())
-        temp2=MVaggregate(temp1, len(list_of_single_layers)) 
+        temp1 = list(m.values())
+        temp2 = MVaggregate(temp1, len(list_of_single_layers)) 
         #temp2=aggregate(temp1,len(list_of_single_layers))
         # This is a list of lists with all centralities for all individuals
         Group_clustering.append(temp2)
@@ -393,21 +391,21 @@ def Group_clustering(Data,list_of_single_layers):
 
 
    
-def Group_degree_centrality(Data,list_of_single_layers):
+def Group_degree_centrality(Data, list_of_single_layers):
     "This list will save all the betweeness centralities means for all individuals"
-    name=list(Data.keys())[-1]
+    name = list(Data.keys())[-1]
 
-    number_of_individuals=Data[name].shape[2]
+    number_of_individuals = Data[name].shape[2]
 
-    Group_deg_centrality=[]
+    Group_deg_centrality = []
     for individual in range(number_of_individuals):
-        temp=multlayerG(individual,Data,list_of_single_layers)
+        temp = multlayerG(individual, Data, list_of_single_layers)
 
-        m=mx.degree_centrality(temp)
+        m = mx.degree_centrality(temp)
         #m=mx.eigenvector_centrality(multlayerG(individual,number_of_layers,list_of_layers))
     #temp=multlayer3(i)
-        temp1=list(m.values())
-        temp2=MVaggregate(temp1, len(list_of_single_layers)) 
+        temp1 = list(m.values())
+        temp2 = MVaggregate(temp1, len(list_of_single_layers)) 
         #temp2=aggregate(temp1,len(list_of_single_layers))
         # This is a list of lists with all centralities for all individuals
         Group_deg_centrality.append(temp2)
@@ -418,22 +416,20 @@ def Group_degree_centrality(Data,list_of_single_layers):
     return flat_list
 
     
-def Group_eccentricity(Data,list_of_single_layers):
+def Group_eccentricity(Data, list_of_single_layers):
     #m=multlayerGNew(3,Supra_MST,[0,5,1])
     "This list will save all the eccentricity for all individuals"
-    name=list(Data.keys())[-1]
+    name = list(Data.keys())[-1]
 
-    number_of_individuals=Data[name].shape[2]
+    number_of_individuals = Data[name].shape[2]
 
-    Group_eccentricity=[]
+    Group_eccentricity = []
     for individual in range(number_of_individuals):
-        temp=multlayerG(individual,Data,list_of_single_layers)
-
-        m=mx.eccentricity(temp)
+        temp = multlayerG(individual, Data, list_of_single_layers)
+        m = mx.eccentricity(temp)
         #m=mx.eigenvector_centrality(multlayerG(individual,number_of_layers,list_of_layers))
-    #temp=multlayer3(i)
-        temp1=list(m.values())
-        temp2=MVaggregate(temp1, len(list_of_single_layers)) 
+        temp1 = list(m.values())
+        temp2 = MVaggregate(temp1, len(list_of_single_layers)) 
         #temp2=aggregate(temp1,len(list_of_single_layers))
         # This is a list of lists with all centralities for all individuals
         Group_eccentricity.append(temp2)
@@ -442,22 +438,22 @@ def Group_eccentricity(Data,list_of_single_layers):
         
     return flat_list
 
-def Non_norm_Group_eccentricity(Data,list_of_single_layers):
+def Non_norm_Group_eccentricity(Data, list_of_single_layers):
     #m=multlayerGNew(3,Supra_MST,[0,5,1])
     "This list will save all the nonormalized eccentricity for all individuals"
-    name=list(Data.keys())[-1]
+    name = list(Data.keys())[-1]
 
-    number_of_individuals=Data[name].shape[2]
+    number_of_individuals = Data[name].shape[2]
 
-    Group_eccentricity=[]
+    Group_eccentricity = []
     for individual in range(number_of_individuals):
-        temp=multlayerG(individual,Data,list_of_single_layers)
+        temp = multlayerG(individual, Data, list_of_single_layers)
 
-        m=mx.eccentricity(temp)
+        m = mx.eccentricity(temp)
         #m=mx.eigenvector_centrality(multlayerG(individual,number_of_layers,list_of_layers))
     #temp=multlayer3(i)
-        temp1=list(m.values())
-        temp2=temp1#MVaggregate(temp1, len(list_of_single_layers)) 
+        temp1 = list(m.values())
+        temp2 = temp1 #MVaggregate(temp1, len(list_of_single_layers)) 
         
         #temp2=aggregate(temp1,len(list_of_single_layers))
         # This is a list of lists with all centralities for all individuals
@@ -468,21 +464,20 @@ def Non_norm_Group_eccentricity(Data,list_of_single_layers):
     return flat_list
 
     
-def Group_bet_centrality(Data,list_of_single_layers):
+def Group_bet_centrality(Data, list_of_single_layers):
     "This list will save all the betweeness centralities means for all individuals"
-    name=list(Data.keys())[-1]
+    name = list(Data.keys())[-1]
 
-    number_of_individuals=Data[name].shape[2]
+    number_of_individuals = Data[name].shape[2]
 
-    Group_bet_centrality=[]
+    Group_bet_centrality = []
     for individual in range(number_of_individuals):
-        temp=multlayerG(individual,Data,list_of_single_layers)
+        temp = multlayerG(individual,Data,list_of_single_layers)
 
-        m=mx.betweenness_centrality(temp)
+        m = mx.betweenness_centrality(temp)
         #m=mx.eigenvector_centrality(multlayerG(individual,number_of_layers,list_of_layers))
-    #temp=multlayer3(i)
-        temp1=list(m.values())
-        temp2=MVaggregate(temp1, len(list_of_single_layers)) 
+        temp1 = list(m.values())
+        temp2 = MVaggregate(temp1, len(list_of_single_layers)) 
         #temp2=aggregate(temp1,len(list_of_single_layers))
         # This is a list of lists with all centralities for all individuals
         Group_bet_centrality.append(temp2)
@@ -496,22 +491,22 @@ def Group_bet_centrality(Data,list_of_single_layers):
 
 "Here comes the mean and standard deviations from all metrics we analized"
     
-def Group_eigenvector_centrality_mean(Data,list_of_single_layers):
+def Group_eigenvector_centrality_mean(Data, list_of_single_layers):
     #m=multlayerGNew(3,Supra_MST,[0,5,1])
     "This list will save all the eigenvector centralities means for all individuals"
-    name=list(Data.keys())[-1]
+    name = list(Data.keys())[-1]
 
-    number_of_individuals=Data[name].shape[2]
+    number_of_individuals = Data[name].shape[2]
 
-    Group_eigenvector_mean=[]
+    Group_eigenvector_mean = []
     for individual in range(number_of_individuals):
-        temp=multlayerG(individual,Data,list_of_single_layers)
+        temp = multlayerG(individual, Data, list_of_single_layers)
 
-        m=mx.eigenvector_centrality_numpy(temp)
+        m = mx.eigenvector_centrality_numpy(temp)
         #m=mx.eigenvector_centrality(multlayerG(individual,number_of_layers,list_of_layers))
     #temp=multlayer3(i)
-        temp1=list(m.values())
-        temp2=MVaggregate(temp1, len(list_of_single_layers)) 
+        temp1 = list(m.values())
+        temp2 = MVaggregate(temp1, len(list_of_single_layers)) 
         #temp2=aggregate(temp1,len(list_of_single_layers))
         
         Group_eigenvector_mean.append(np.mean(temp2))
@@ -522,19 +517,18 @@ def Group_eigenvector_centrality_mean(Data,list_of_single_layers):
 
 
 
-def Group_eigenvector_centrality_std(Data,list_of_single_layers):
+def Group_eigenvector_centrality_std(Data, list_of_single_layers):
     "This list will save all the eigenvector centralities stds for all individuals"
-    name=list(Data.keys())[-1]
+    name = list(Data.keys())[-1]
 
-    number_of_individuals=Data[name].shape[2]
-    Group_eigenvector_std=[]
+    number_of_individuals = Data[name].shape[2]
+    Group_eigenvector_std = []
     for individual in range(number_of_individuals):
-        temp=multlayerG(individual,Data,list_of_single_layers)
-        m=mx.eigenvector_centrality_numpy(temp)
+        temp = multlayerG(individual, Data, list_of_single_layers)
+        m = mx.eigenvector_centrality_numpy(temp)
         #m=mx.eigenvector_centrality(multlayerG(individual,number_of_layers,list_of_layers))
-    #temp=multlayer3(i)
-        temp1=list(m.values())
-        temp2=MVaggregate(temp1, len(list_of_single_layers)) # This is MV aggregate - we can change then later for something else
+        temp1 = list(m.values())
+        temp2 = MVaggregate(temp1, len(list_of_single_layers)) # This is MV aggregate - we can change then later for something else
         #temp2=aggregate(temp1,len(list_of_single_layers))
         
         Group_eigenvector_std.append(np.std(temp2))
@@ -542,13 +536,13 @@ def Group_eigenvector_centrality_std(Data,list_of_single_layers):
     return (Group_eigenvector_std)
 
 
-###############################
-#SOME PLOTTING FUNCTIONS FOR EC   
-###############################
-#"Those are functions to plot the previous functions."
+##################################
+# SOME PLOTTING FUNCTIONS FOR EC #  
+##################################
 
 
-def Plot_Group_EC(Data,list_of_single_layers):
+
+def Plot_Group_EC(Data, list_of_single_layers):
     """This function plots a histogram with the values of the Eigenvalue centrality for all nodes across all individuals."
 
     Parameters
@@ -571,20 +565,20 @@ def Plot_Group_EC(Data,list_of_single_layers):
     
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
 
-    temp=Group_eigenvector_centrality(Data,list_of_single_layers)
+    temp = Group_eigenvector_centrality(Data,list_of_single_layers)
     plt.figure(figsize=(8,5))
     plt.hist(temp)
     # We can edit here the output if we have a vector with the name of the layers
-    plt.xlabel('Eig. centr. - aggr- all nodes all individuals ',fontsize=20)
+    plt.xlabel('Eig. centr. - aggr- all nodes all individuals ', fontsize=20)
     #plt.xlim(-5,220)
-    plt.ylabel("frequence",fontsize=20)
+    plt.ylabel("frequence", fontsize=20)
     #plt.xlim(40, 160)
     plt.ylim(0, 3500)
-#plt.title('individual '+str(individual))
+    #plt.title('individual '+str(individual))
     plt.show()
 
 
-def Plot_EC(individual,Data,list_of_single_layers):
+def Plot_EC(individual, Data, list_of_single_layers):
     """This function plots a histogram with the values of the Eigenvalue centrality for all nodes one individual."
 
     Parameters
@@ -607,28 +601,23 @@ def Plot_EC(individual,Data,list_of_single_layers):
     
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
     #multlayerG(individual,Data,list_of_single_layers)
-    m=mx.eigenvector_centrality_numpy(multlayerG(individual,Data,list_of_single_layers))
+    m = mx.eigenvector_centrality_numpy(multlayerG(individual,Data,list_of_single_layers))
     #temp=multlayer3(i)
-    temp1=list(m.values())
-    temp2=MVaggregate(temp1, len(list_of_single_layers)) 
+    temp1 = list(m.values())
+    temp2 = MVaggregate(temp1, len(list_of_single_layers)) 
     # This is the Mux Viz aggregate - We change the aggregate here if yo want later
     #temp2=aggregate(temp1,len(list_of_single_layers))
     plt.hist((temp2))
     ###IMPROVEMENT: We can edit here the output if we have a vector with the name of the layers
-    plt.xlabel('Eigenvector centrality - aggregate ',fontsize=20)
+    plt.xlabel('Eigenvector centrality - aggregate ', fontsize=20)
     #plt.xlim(-5,220)
-    plt.ylabel("frequence",fontsize=20)
+    plt.ylabel("frequence", fontsize=20)
     plt.ylim(0, 100)
-    plt.title('individual '+str(individual))
+    plt.title('individual '+ str(individual))
     plt.show()
     return
-    
+             
 
-
-
-            
-
-#
 #def aggregate(multiple_layers_list, number_layers):
 #    k, m = divmod(len(multiple_layers_list), number_layers)
 #    temp=list(multiple_layers_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_layers))
@@ -641,13 +630,12 @@ def Plot_EC(individual,Data,list_of_single_layers):
     #return np.mean(temp, axis=0)
 
 
-
-def eigenvectorcentrality(individual,Data,list_of_single_layers):
+def eigenvectorcentrality(individual, Data, list_of_single_layers):
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
     #multlayerG(individual,Data,list_of_single_layers)
-    m=mx.eigenvector_centrality_numpy(multlayerG(individual,Data,list_of_single_layers))
+    m = mx.eigenvector_centrality_numpy(multlayerG(individual, Data, list_of_single_layers))
     #temp=multlayer3(i)
-    temp1=list(m.values())
+    temp1 = list(m.values())
     #temp2=aggregate(temp1,len(list_of_single_layers))
     #plt.hist((temp2))
     # We can edit here the output if we have a vector with the name of the layers
@@ -661,37 +649,32 @@ def eigenvectorcentrality(individual,Data,list_of_single_layers):
 
 def Group_degree_centrality_mean(Data,list_of_single_layers):
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
-
     #print('layers =',[layer_tags[i] for i in list_of_single_layers])
-    name=list(Data.keys())[-1]
+    name = list(Data.keys())[-1]
+    number_of_individuals = Data[name].shape[2]
 
-    number_of_individuals=Data[name].shape[2]
     "This list will save all the eigenvector centralities means for all individuals"
-    Group_degree_centrality_mean=[]
+    Group_degree_centrality_mean = []
     for individual in range(number_of_individuals):
-        m=mx.degree_centrality(multlayerG(individual,Data,list_of_single_layers))
-    #temp=multlayer3(i)
-        temp1=list(m.values()) # this is not aggregated 
-        temp2=MVaggregate(temp1, len(list_of_single_layers)) # This is Mux Viz aggregate
+        m = mx.degree_centrality(multlayerG(individual,Data,list_of_single_layers))
+        temp1 = list(m.values()) # this is not aggregated 
+        temp2 = MVaggregate(temp1, len(list_of_single_layers)) # This is Mux Viz aggregate
         #temp2=aggregate(temp1,len(list_of_single_layers))
         # IF you want - by any chance to do a different agreggate you should change the line above
         Group_degree_centrality_mean.append(np.mean(temp2))
         
     return (Group_degree_centrality_mean)
 
-def Group_degree_centrality_std(Data,list_of_single_layers):
+def Group_degree_centrality_std(Data, list_of_single_layers):
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
-    name=list(Data.keys())[-1]
-
-
-    number_of_individuals=Data[name].shape[2]
+    name = list(Data.keys())[-1]
+    number_of_individuals = Data[name].shape[2]
     "This list will save all the eigenvector centralities means for all individuals"
-    Group_degree_centrality_std=[]
+    Group_degree_centrality_std = []
     for individual in range(number_of_individuals):
-        m=mx.degree_centrality(multlayerG(individual,Data,list_of_single_layers))
-    #temp=multlayer3(i)
-        temp1=list(m.values())
-        temp2=MVaggregate(temp1, len(list_of_single_layers))  # This is Mux Viz aggregate
+        m = mx.degree_centrality(multlayerG(individual, Data, list_of_single_layers))
+        temp1 = list(m.values())
+        temp2 = MVaggregate(temp1, len(list_of_single_layers))  # This is Mux Viz aggregate
         #temp2=aggregate(temp1,len(list_of_single_layers)) You can change the aggregate here
         print(temp2)
         Group_degree_centrality_std.append(np.std(temp2))
@@ -701,31 +684,32 @@ def Group_degree_centrality_std(Data,list_of_single_layers):
 
 
 #### IMPROVEMENT ALSO WITHIM
-def Mask_subnetwork(result,target):
-    "If you say the target nodes for a given subnetwork, this command you return only the results of list associated with the target nodes"
+def Mask_subnetwork(result, target):
+    "If you say the target nodes for a given subnetwork, this function returns only the results of the list associated with the target nodes"
     chunks = [result[x:x+layer_size] for x in range(0, len(result), layer_size)]
-    mask=[chunk[x] for chunk in chunks for x in target]
+    mask = [chunk[x] for chunk in chunks for x in target]
     
     return mask
+
 # This creates a SPSS file - Data is the data, name is the name of the file and tag is the collum name
-def SaveSPSS(Data,name,tag):
+def SaveSPSS(Data, name, tag):
     #Data=Mask_subnetwork(result,target)
     cols = [tag]
-    df = pd.DataFrame(Data,columns=cols)
+    df = pd.DataFrame(Data, columns=cols)
     df.to_csv(name+'.csv')
     #pyreadstat.write_sav(df, name+'.csv')
     return
 
 
 # Check if You wanna put Mask true of False - create a bollean that does stuff when a mask is choosen or not
-def Function_output(function,Data,filename,colname,layers):
-    # THis can be nany function we develeloped!
-    temp=function(Data,layers)
-    FPN=list(range(0,197)) #THIS IS WITHOUT THE MASK - before 197
+def Function_output(function, Data, filename, colname, layers):
+    # This can be nany function we develeloped!
+    temp = function(Data, layers)
+    FPN = list(range(0,197)) #THIS IS WITHOUT THE MASK - before 197
     #FPN=[16,17,18,19,20,21,28,29,30,31,93,94,123,124,133,134,163,164]
     #old one - FPN=[16,17,18,19,20,21,28,29,30,31,93,94,129,130,139,140,169,170]
-    temp_FPN=Mask_subnetwork(temp,FPN)
-    SaveSPSS(temp_FPN,filename,colname)
+    temp_FPN = Mask_subnetwork(temp, FPN)
+    SaveSPSS(temp_FPN, filename, colname)
     
     return
 

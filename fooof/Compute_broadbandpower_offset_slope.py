@@ -38,11 +38,11 @@ import os
 import glob
 
 # Third party imports ### (Put here third-party libraries e.g. pandas, numpy)
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-from scipy import signal
-from fooof import FOOOF
+import numpy as np # version 1.19.1
+import matplotlib.pyplot as plt # version 3.3.0
+import pandas as pd # version 1.1.0
+from scipy import signal # version 1.4.1
+from fooof import FOOOF # version 0.1.3
 
 
 # ------------------------------------------------------------------------------

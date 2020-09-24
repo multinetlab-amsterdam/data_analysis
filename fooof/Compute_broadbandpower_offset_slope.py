@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ Computes broadband power, offset and slope of power spectrum
-Created on Mon Sep 14 12:09:27 2020
 
 Based on selected epochs (e.g. ASCIIS) in the NO-cohorten file a power spectrum 
 is computed. Based on this power spectrum the broadband power is calculated, 
 followed by the offset and slope using the FOOOF algorithm. 
 
-reference paper FOOOF: Haller M, Donoghue T, Peterson E, Varma P, Sebastian P, Gao R, Noto T, 
+Reference paper FOOOF: Haller M, Donoghue T, Peterson E, Varma P, Sebastian P, Gao R, Noto T, 
 Knight RT, Shestyuk A, Voytek B (2018) Parameterizing Neural Power Spectra. 
 bioRxiv, 299859. doi: https://doi.org/10.1101/299859
-reference github: https://fooof-tools.github.io/fooof/index.html
+reference Github: https://fooof-tools.github.io/fooof/index.html
 
-@author: t.numan
 """
 
 __author__ = "Tianne Numan"
@@ -32,12 +30,12 @@ __status__ = "Production"
 # Libraries        #
 ####################
 
-# Standard imports  ### (Put here built-in libraries - https://docs.python.org/3/library/)
+# Standard imports  
 import time
 import os
 import glob
 
-# Third party imports ### (Put here third-party libraries e.g. pandas, numpy)
+# Third party imports 
 import numpy as np # version 1.19.1
 import matplotlib.pyplot as plt # version 3.3.0
 import pandas as pd # version 1.1.0
@@ -47,20 +45,21 @@ from fooof import FOOOF # version 0.1.3
 
 # ------------------------------------------------------------------------------
 def get_names_epochs(location, nr_epochs=10, extension='.asc'):
-    """ obtains the names of MEG ASCIIs as saved in NO-cohorten
+    """ Obtains the names of MEG ASCIIs as saved in folder (e.g., NO-cohorten)
+    
     Parameters
     ----------
-    location : str
-        give the directory where the ASCIIS are stored 
-    nr_epochs : int, optional 
-        number of epochs, default=10
-    extension : str, optional
-        give the extension of the file you're looking for, default='.asc'    
+    location: str
+        Give the directory where the ASCIIS are stored 
+    nr_epochs: int, optional 
+        Number of epochs, default=10
+    extension: str, optional
+        Give the extension of the file you're looking for, default='.asc'    
     
     Returns
     -------
     selected_asciis : list
-        list with strings of ASCII names
+        List with strings of ASCII names
     """
     
     selected_asciis = []
@@ -81,33 +80,34 @@ def get_names_epochs(location, nr_epochs=10, extension='.asc'):
 
 def cal_power_spectrum (timeseries, nr_rois=np.arange(92), fs=1250, window='hamming', nperseg=4096, 
                         scaling='spectrum', plot_figure=False, title_plot='average power spectrum'):
-    """ calculate (and plot) power spectrum of timeseries
+    """ Calculate (and plot) power spectrum of timeseries
+    
     Parameters
     ----------
-    timeseries : DataFrame with ndarrays
-        rows are timepoints, columns are rois/electrodes
+    timeseries: DataFrame with ndarrays
+        Rows are timepoints, columns are rois/electrodes
     rois: int, optional
-        give list with rois/electrodes you want to include, default=np.arange(92)
+        Give list with rois/electrodes you want to include, default=np.arange(92)
     fs: int, optional    
-        sample freuqency, default=1250    
+        Sample frequency, default=1250    
     window: str or tuple, optional
-        type of window you want to use, check spectral.py for details, default=' hamming'
+        Type of window you want to use, check spectral.py for details, default='hamming'
     nperseg : int, optional    
-        length of each segment, default=4096
+        Length of each segment, default=4096
     scaling : str, optional
         'density' calculates the power spectral density (V**2/Hz), 'spectrum' calculates the 
         power spectrum (V**2), default='spectrum'
-    plot_figure : bool
-        creates a figure of the mean + std over all rois/electrodes, default=False
-    title_plot : str
-        give title of the plot, default='average power spectrum'
+    plot_figure: bool
+        Creates a figure of the mean + std over all rois/electrodes, default=False
+    title_plot: str
+        Give title of the plot, default='average power spectrum'
         
     Returns
     -------
-    f : ndarray
-        array with sample frequencies (x-asix of power spectrum plot)
-    pxx : ndarray
-        columns of power spectra for each roi/VE
+    f: ndarray
+        Array with sample frequencies (x-asix of power spectrum plot)
+    pxx: ndarray
+        Columns of power spectra for each roi/VE
             
     """
   
@@ -131,18 +131,19 @@ def cal_power_spectrum (timeseries, nr_rois=np.arange(92), fs=1250, window='hamm
 
 
 def find_nearest(array, value):
-    """ find nearest value of interest in array (used for frequencies, no double value issues)
+    """ Find nearest value of interest in array (used for frequencies, no double value issues)
+    
     Parameters
     ----------
-    array : array
-        give the array in which you want to find index of value nearest-by
-    value : int or float
-        the value of interest
+    array: array
+        Give the array in which you want to find index of value nearest-by
+    value: int or float
+        The value of interest
      
     Return
     ------
-    idx : int
-        index of value nearest by value of interest    
+    idx: int
+        Index of value nearest by value of interest    
     
     """
     array = np.asarray(array)
@@ -152,33 +153,34 @@ def find_nearest(array, value):
 
 def run_loop_powerspectrum(subject_list, extension='.asc', nr_epochs=10, nr_rois=np.arange(92), 
                            Fs=1250, window_length=4096, freq_range=[0.5, 48]):
-    """ calculate power spectrum for all cases within the subject_list
+    """ Calculate power spectrum for all cases within the subject_list
+    
     Parameters
     ----------
-    subject_list : DataFrame or list
+    subject_list: DataFrame or list
         DataFrame should contain a column 'location_MEG' with the directory of all MEG 
         ASCIIs for each subject. List should contain only 1 column describing the location. 
-    extension : str, optional
-        give the extension of ASCIIs, '.txt' or '.asc', default='.asc'
-    nr_rpochs : int, optional
-        give number of epochs you want to include, default=10
-    nr_rois : int, optional
-        give list with  rois you want to analyse, default=np.arange(92)
-    Fs : int, optional
-        sample frequency, default=1250
-    window_length : int, optional
-        window length to calculate power spectrum, default=4096
-    freq_range : list, optional
-        gives the upper and lower boundaries to calculate the broadband power, default=[0.5, 48]    
+    extension: str, optional
+        Give the extension of ASCIIs, '.txt' or '.asc', default='.asc'
+    nr_rpochs: int, optional
+        Give number of epochs you want to include, default=10
+    nr_rois: int, optional
+        Give list with  rois you want to analyse, default=np.arange(92)
+    Fs: int, optional
+        Sample frequency, default=1250
+    window_length: int, optional
+        Window length to calculate power spectrum, default=4096
+    freq_range: list, optional
+        Gives the upper and lower boundaries to calculate the broadband power, default=[0.5, 48]    
     
     Return
     ------
-    mean_pxx : ndarray (size: len(subjects), len(power spectrum), nr_rois)
-        power spectum for all subjects, and all rois/VE, averaged over nr_epochs
+    mean_pxx: ndarray (size: len(subjects), len(power spectrum), nr_rois)
+        Power spectum for all subjects, and all rois/VE, averaged over nr_epochs
     broadband_power : ndarray (size: len(subjects), nr_rois)
-        broadband power between freq_range
-    f : ndarray
-        array with sample frequencies (x-asix of power spectrum plot)
+        Broadband power between freq_range
+    f: ndarray
+        Array with sample frequencies (x-axis of power spectrum plot)
    
     """  
     
@@ -209,28 +211,28 @@ def run_loop_powerspectrum(subject_list, extension='.asc', nr_epochs=10, nr_rois
 
 
 def cal_FOOOF_parameters(pxx, f, freq_range=[0.5, 48]):
-    """ obtain slope and offset using the FOOOF algorithm
-    reference paper: Haller M, Donoghue T, Peterson E, Varma P, Sebastian P, Gao R, Noto T, 
+    """ Obtain slope and offset using the FOOOF algorithm
+    Reference paper: Haller M, Donoghue T, Peterson E, Varma P, Sebastian P, Gao R, Noto T, 
     Knight RT, Shestyuk A, Voytek B (2018) Parameterizing Neural Power Spectra. 
     bioRxiv, 299859. doi: https://doi.org/10.1101/299859
     
-    reference github: https://fooof-tools.github.io/fooof/index.html
+    Reference Github: https://fooof-tools.github.io/fooof/index.html
     
     Parameters
     ----------
-    pxx : ndarray
-        column of power spectra 
-    f : 1d-array
-        array with sample frequencies (x-asix of power spectrum plot)
-    freq_range : list, optional
-        gives the upper and lower boundaries to calculate the broadband power, default=[0.5, 48]
+    pxx: ndarray
+        Column of power spectra 
+    f: 1d-array
+        Array with sample frequencies (x-asix of power spectrum plot)
+    freq_range: list, optional
+        Gives the upper and lower boundaries to calculate the broadband power, default=[0.5, 48]
     
     Returns
     -------
-    FOOOF_offset : float
-        offset 
-    FOOOF_slope  : float
-        slope  
+    FOOOF_offset: float
+        Offset 
+    FOOOF_slope: float
+        Slope  
     
     """
     
@@ -259,7 +261,7 @@ atlas = 'AAL' # AAL or BNA
 # select either a list of rois (e.g. np.arange(78) when using the cortical regions of the AAL)
 # or a single roi (e.g. (10,) if you want to evaluate roi 11
 nr_rois = np.arange(78) # give list of rois or 1 rois (AAL cortical = 78, BNA cortical = 210)
-#nr_rois = (10,) # only run for roi 10 # note that python idexes at 0!
+#nr_rois = (10,) # only run for roi 10 # note that python indexes at 0!
 
 nr_epochs= 10 # number of epochs
 Fs = 1250 # sample frequency
@@ -301,8 +303,6 @@ if save_output == True:
     print('saving power spectra and broadband power')
     
 
-
-
 ###### Compute FOOOOF offset and slope ######
 # create empty arrays to store offset and slope values
 offset = np.empty([mean_pxx.shape[0], mean_pxx.shape[2]]) # index 0 -> number of subjects, index 2 -> number of rois
@@ -333,10 +333,10 @@ if save_output == True:
     np.save(dir_output + name_to_save + '_FOOOF_offset', offset)
     np.save(dir_output + name_to_save + '_FOOOF_slope', slope)
     # save offset and slope output of FOOOF
-    print("FOOOF-offset is saved: "+ dir_output + name_to_save + "_FOOOF_offset" )
-    print("FOOOF-slope is saved: "+ dir_output + name_to_save + "_FOOOF_slope" )
+    print("FOOOF-offset is saved: "+ dir_output + name_to_save + "_FOOOF_offset")
+    print("FOOOF-slope is saved: "+ dir_output + name_to_save + "_FOOOF_slope")
     
-######## Combine results with Case_ID in 'subjects' variable
+######## Combine results with Case_ID in 'subjects' variable ######
     
 subjects['mean_broadbandpower'] = np.mean(broadband_power, axis=1)     
 subjects['mean_offset'] = np.mean(offset, axis=1)

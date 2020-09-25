@@ -6,9 +6,15 @@ Based on selected epochs (e.g. ASCIIS) in the NO-cohorten file a power spectrum
 is computed. Based on this power spectrum the broadband power is calculated, 
 followed by the offset and slope using the FOOOF algorithm. 
 
+<<<<<<< HEAD
 Reference paper FOOOF: Haller M, Donoghue T, Peterson E, Varma P, Sebastian P, 
 Gao R, Noto T, Knight RT, Shestyuk A, Voytek B (2018) Parameterizing Neural 
 Power Spectra. bioRxiv, 299859. doi: https://doi.org/10.1101/299859
+=======
+Reference paper FOOOF: Haller M, Donoghue T, Peterson E, Varma P, Sebastian P, Gao R, Noto T, 
+Knight RT, Shestyuk A, Voytek B (2018) Parameterizing Neural Power Spectra. 
+bioRxiv, 299859. doi: https://doi.org/10.1101/299859
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
 reference Github: https://fooof-tools.github.io/fooof/index.html
 
 """
@@ -86,9 +92,14 @@ def get_names_epochs(location, nr_epochs=10, extension='.asc'):
     return selected_asciis            
 
 
+<<<<<<< HEAD
 def cal_power_spectrum (timeseries, nr_rois=np.arange(92), fs=1250, 
             window='hamming', nperseg=4096, scaling='spectrum', 
             plot_figure=False, title_plot='average power spectrum'):
+=======
+def cal_power_spectrum (timeseries, nr_rois=np.arange(92), fs=1250, window='hamming', nperseg=4096, 
+                        scaling='spectrum', plot_figure=False, title_plot='average power spectrum'):
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     """ Calculate (and plot) power spectrum of timeseries
     
     Parameters
@@ -96,6 +107,7 @@ def cal_power_spectrum (timeseries, nr_rois=np.arange(92), fs=1250,
     timeseries: DataFrame with ndarrays
         Rows are timepoints, columns are rois/electrodes
     rois: int, optional
+<<<<<<< HEAD
         Give list with rois/electrodes you want to include, 
         default=np.arange(92)
     fs: int, optional    
@@ -111,6 +123,20 @@ def cal_power_spectrum (timeseries, nr_rois=np.arange(92), fs=1250,
     plot_figure: bool
         Creates a figure of the mean + std over all rois/electrodes, 
         default=False
+=======
+        Give list with rois/electrodes you want to include, default=np.arange(92)
+    fs: int, optional    
+        Sample frequency, default=1250    
+    window: str or tuple, optional
+        Type of window you want to use, check spectral.py for details, default='hamming'
+    nperseg : int, optional    
+        Length of each segment, default=4096
+    scaling : str, optional
+        'density' calculates the power spectral density (V**2/Hz), 'spectrum' calculates the 
+        power spectrum (V**2), default='spectrum'
+    plot_figure: bool
+        Creates a figure of the mean + std over all rois/electrodes, default=False
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     title_plot: str
         Give title of the plot, default='average power spectrum'
         
@@ -145,8 +171,12 @@ def cal_power_spectrum (timeseries, nr_rois=np.arange(92), fs=1250,
 
 
 def find_nearest(array, value):
+<<<<<<< HEAD
     """ Find nearest value of interest in array (used for frequencies, 
     no double value issues)
+=======
+    """ Find nearest value of interest in array (used for frequencies, no double value issues)
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     
     Parameters
     ----------
@@ -166,17 +196,27 @@ def find_nearest(array, value):
     return idx
 
 
+<<<<<<< HEAD
 def run_loop_powerspectrum(subject_list, extension='.asc', nr_epochs=10, 
             nr_rois=np.arange(92), Fs=1250, window_length=4096, 
             freq_range=[0.5, 48]):
+=======
+def run_loop_powerspectrum(subject_list, extension='.asc', nr_epochs=10, nr_rois=np.arange(92), 
+                           Fs=1250, window_length=4096, freq_range=[0.5, 48]):
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     """ Calculate power spectrum for all cases within the subject_list
     
     Parameters
     ----------
     subject_list: DataFrame or list
+<<<<<<< HEAD
         DataFrame should contain a column 'location_MEG' with the directory of 
         all MEG ASCIIs for each subject. List should contain only 1 column 
         describing the location. 
+=======
+        DataFrame should contain a column 'location_MEG' with the directory of all MEG 
+        ASCIIs for each subject. List should contain only 1 column describing the location. 
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     extension: str, optional
         Give the extension of ASCIIs, '.txt' or '.asc', default='.asc'
     nr_rpochs: int, optional
@@ -188,14 +228,22 @@ def run_loop_powerspectrum(subject_list, extension='.asc', nr_epochs=10,
     window_length: int, optional
         Window length to calculate power spectrum, default=4096
     freq_range: list, optional
+<<<<<<< HEAD
         Gives the upper and lower boundaries to calculate the broadband power, 
         default=[0.5, 48]    
+=======
+        Gives the upper and lower boundaries to calculate the broadband power, default=[0.5, 48]    
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     
     Return
     ------
     mean_pxx: ndarray (size: len(subjects), len(power spectrum), nr_rois)
+<<<<<<< HEAD
         Power spectum for all subjects, and all rois/VE, averaged over 
         nr_epochs
+=======
+        Power spectum for all subjects, and all rois/VE, averaged over nr_epochs
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     broadband_power : ndarray (size: len(subjects), nr_rois)
         Broadband power between freq_range
     f: ndarray
@@ -238,9 +286,15 @@ def run_loop_powerspectrum(subject_list, extension='.asc', nr_epochs=10,
 
 def cal_FOOOF_parameters(pxx, f, freq_range=[0.5, 48]):
     """ Obtain slope and offset using the FOOOF algorithm
+<<<<<<< HEAD
     Reference paper: Haller M, Donoghue T, Peterson E, Varma P, Sebastian P, 
     Gao R, Noto T, Knight RT, Shestyuk A, Voytek B (2018) Parameterizing Neural
     Power Spectra. bioRxiv, 299859. doi: https://doi.org/10.1101/299859
+=======
+    Reference paper: Haller M, Donoghue T, Peterson E, Varma P, Sebastian P, Gao R, Noto T, 
+    Knight RT, Shestyuk A, Voytek B (2018) Parameterizing Neural Power Spectra. 
+    bioRxiv, 299859. doi: https://doi.org/10.1101/299859
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     
     Reference Github: https://fooof-tools.github.io/fooof/index.html
     
@@ -251,8 +305,12 @@ def cal_FOOOF_parameters(pxx, f, freq_range=[0.5, 48]):
     f: 1d-array
         Array with sample frequencies (x-asix of power spectrum plot)
     freq_range: list, optional
+<<<<<<< HEAD
         Gives the upper and lower boundaries to calculate the broadband power, 
         default=[0.5, 48]
+=======
+        Gives the upper and lower boundaries to calculate the broadband power, default=[0.5, 48]
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     
     Returns
     -------
@@ -288,8 +346,12 @@ atlas = 'AAL' # AAL or BNA
 # select either a list of rois (e.g. np.arange(78) when using the cortical 
 # regions of the AAL)
 # or a single roi (e.g. (10,) if you want to evaluate roi 11
+<<<<<<< HEAD
 nr_rois = np.arange(78) 
 # give list of rois or 1 rois (AAL cortical = 78, BNA cortical = 210)
+=======
+nr_rois = np.arange(78) # give list of rois or 1 rois (AAL cortical = 78, BNA cortical = 210)
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
 #nr_rois = (10,) # only run for roi 10 # note that python indexes at 0!
 
 nr_epochs= 10 # number of epochs
@@ -370,8 +432,12 @@ if save_output == True:
     np.save(dir_output + name_to_save + '_FOOOF_offset', offset)
     np.save(dir_output + name_to_save + '_FOOOF_slope', slope)
     # save offset and slope output of FOOOF
+<<<<<<< HEAD
     print("FOOOF-offset is saved: "+ dir_output + name_to_save 
           + "_FOOOF_offset")
+=======
+    print("FOOOF-offset is saved: "+ dir_output + name_to_save + "_FOOOF_offset")
+>>>>>>> 780cc47abd9cfdcd7918e37eaa4e443caf889ae1
     print("FOOOF-slope is saved: "+ dir_output + name_to_save + "_FOOOF_slope")
     
 ######## Combine results with Case_ID in 'subjects' variable ######

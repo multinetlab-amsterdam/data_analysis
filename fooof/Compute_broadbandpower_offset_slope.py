@@ -168,7 +168,7 @@ def find_nearest(array, value):
     return idx
 
 
-def run_loop_powerspectrum(subject_list, extension='.asc', nr_epochs=10, 
+def run_loop_powerspectrum(subjects, extension='.asc', nr_epochs=10, 
             nr_rois=np.arange(92), Fs=1250, window_length=4096, 
             freq_range=[0.5, 48]):
 
@@ -176,7 +176,7 @@ def run_loop_powerspectrum(subject_list, extension='.asc', nr_epochs=10,
     
     Parameters
     ----------
-    subject_list: DataFrame, list, or string
+    subjects: DataFrame, list, or string
         DataFrame should contain a column 'location_MEG' with the directory of 
         all MEG ASCIIs for each subject. List should contain only 1 column 
         describing the location. String should be the name of the ASCII
@@ -208,29 +208,30 @@ def run_loop_powerspectrum(subject_list, extension='.asc', nr_epochs=10,
    
     """  
     
-    mean_pxx = np.empty([len(subject_list), int(window_length/2+1), np.size(nr_rois)])
-    broadband_power = np.empty([len(subject_list), np.size(nr_rois)])
-    if isinstance(subject_list, str):
-        single_ascii = subject_list
+    mean_pxx = np.empty([len(subjects), int(window_length/2+1), np.size(nr_rois)])
+    broadband_power = np.empty([len(subjects), np.size(nr_rois)])
+    if isinstance(subjects, str):
+        single_ascii = subjects
         timeseries =pd.read_csv(single_ascii, index_col=False, 
                                     header=None, delimiter='\t') 
         f, pxx = cal_power_spectrum(timeseries, nr_rois=nr_rois, fs=Fs, plot_figure=False, title_plot='power spectrum')
         mean_pxx= pxx            
         broadband_power = np.sum(mean_pxx[find_nearest(f,freq_range[0]):find_nearest(f, freq_range[1]),:], axis=0)
     else:
-        if ~isinstance(subject_list, pd.DataFrame): 
+        if ~isinstance(subjects, pd.DataFrame): 
             # check if subject_list is dataframe (or list)
-            subject_list=pd.DataFrame(subject_list, columns = ['location_MEG']) 
+            subjects=pd.DataFrame(subjects, columns = ['location_MEG']) 
             # save dataframe with column 'location'
-            for sub in range(len(subject_list)):
-                asciis = get_names_epochs(subject_list['location_MEG'][sub], nr_epochs, extension)
+            for sub in range(len(subjects)):
+                asciis = get_names_epochs(subjects['location_MEG'][sub], nr_epochs, extension)
+                print(asciis)
                 sub_pxx = np.zeros((nr_epochs, int(window_length/2+1), np.size(nr_rois)))
                 mean_pxx[sub,:,:] = 'nan'
                 broadband_power[sub,:] = 'nan'
                 f = np.empty(int(window_length/2+1))
-                print(sub)
+                #print(sub)
                 if len(asciis) == 0:
-                    print("no ASCIIs available for: " + subject_list['location_MEG'][sub])
+                    print("no ASCIIs available for: " + subjects['location_MEG'][sub])
                     continue    
                 for j in range(nr_epochs):
                     timeseries =pd.read_csv(asciis[j][1:-1], index_col=False, 
@@ -305,16 +306,16 @@ single_ascii = '/data/doorgeefluik/mumo_002_OD1_Tr01.asc'
 # 2b_1. If you selected no; you can create an list of subjects you want to process
 # an example is given here: '/data/KNW/t.numan/GOALS/example_MEG_list.csv'
 # only available for NO-cohorten data!
-subject_list = '/data/KNW/t.numan/GOALS/example_MEG_list.csv'
-dir_input = '/data/KNW/NO-cohorten/Scans/'
+subject_list = './example_MEG_list.csv'
+dir_input = '/data/doorgeefluik/'
 # 2b_2. You can select AAL or BNA atlas
-atlas = 'AAL' # AAL or BNA
+atlas = '' # AAL or BNA
 # 2b_3. Select the number of epochs you want to preprocess
-nr_epochs= 10 # number of epochs
+nr_epochs = 2 # number of epochs
 
 # 3. Select which roi or rois you want to analyze
 # if you want to analyze 1 roi, specify its number (nr_rois = (10,))
-nr_rois = (10,) # only run for roi 11 # note that python indexes at 0!
+nr_rois = [0,1] # only run for roi 11 # note that python indexes at 0!
 # if you want to analyze multiple rois, create list with these rois
 # (for example nr_rois = np.arange(78) for all 78 cortical AAL rois)
 
@@ -324,11 +325,11 @@ Fs = 1250 # sample frequency
 freq_range=[0.5, 48] # frequency range you want to analyze
 
 # 6. Give output directory
-dir_output = '/data/KNW/t.numan/GOALS/tmp/'
+dir_output = '/data/KNW/e.centeno/'
 # 7a. Do you want to save the output? 
-save_output = True # you can save output
+save_output = False # you can save output
 # 7b. Provide relevant name to save your run
-name_to_save = 'test_mumo_002_roi_11'
+name_to_save = 'test_FooF'
 
 
 ###########################
@@ -343,7 +344,7 @@ if process_single_ASCII=='no':
     # add padding zeros when necessary
 
     # get location of ASCIIs of MEG 
-    subjects['location_MEG'] = dir_input + 'sub-'+ subjects['Case_ID'] + '/meg/' + subjects['MM'] + '/' + atlas + '/' 
+    subjects['location_MEG'] = dir_input + subjects['Case_ID'] + '//' + subjects['MM'] + '/' + atlas + '/' 
     ###### Compute power spectrum ######
     ## takes a while when multiple subjects are analyzed at once
     mean_pxx, broadband_power, f = run_loop_powerspectrum(subjects, 
@@ -427,13 +428,13 @@ if save_output == True:
     
 ######## Combine results with Case_ID in 'subjects' variable ######
     # only whem multiple cases are processed at once 
-if process_single_ASCII=='no':   
-    subjects['mean_broadbandpower'] = np.mean(broadband_power, axis=1)     
-    subjects['mean_offset'] = np.mean(offset, axis=1)
-    subjects['mean_slope'] = np.mean(slope, axis=1)
+# if process_single_ASCII=='no':   
+#     subjects['mean_broadbandpower'] = np.mean(broadband_power, axis=1)     
+#     subjects['mean_offset'] = np.mean(offset, axis=1)
+#     subjects['mean_slope'] = np.mean(slope, axis=1)
 
-    subjects.to_csv(dir_output + name_to_save + '_summary.csv' , sep=';', 
-                index=False)
-    # you can import this .csv file in SPSS or Excel
+#     subjects.to_csv(dir_output + name_to_save + '_summary.csv' , sep=';', 
+#                 index=False)
+#     # you can import this .csv file in SPSS or Excel
     
 

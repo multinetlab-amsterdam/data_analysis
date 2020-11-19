@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """This is the main code used at the MULTINETLAB for Multilayer Analysis.
-   This code can create a Multilayer network object - similar to the ones in Networkx 
-   It has as an input a Supra Adjacency Matrix. 
+   This code can create a Multilayer network object - similar to the ones in Networkx.
+   It uses a Supra Adjacency Matrix as input. 
    For privacy reasons, we provide a random MST file.
 """
 
@@ -18,6 +18,7 @@ __status__ = "Production"
 ####################
 
 # Reviewed by Eduarda Centeno 20200909
+# Reviewed by Lucas Breedt 202011..
 
 
 ####################
@@ -46,21 +47,19 @@ from sklearn.preprocessing import MinMaxScaler
 
 ### Comments with more than one '# means for further developments!!!
 
-# One should just change the value of (which is now  N=203) as the size of the matrix according to the demand
-
-""" The user should declare the supra matrices files in the beginning of the code - The code is quite robust - 
-as long as the matrices are created using a similar pipeline as the one in the Lab."""
+""" The user should define the input file (supra-adjacency matrix) in the beginning of the code. 
+The code is quite robust - as long as the matrices are created using a pipeline similar to the one in the Lab."""
 
 ####################
 # SETTINGS         #
 ####################
 
-layer_size = 197   # This was our setting for BNA ATLAS -If you have another atlas, with a different number of nodes, change this here!
+layer_size = 197   # Define the number of nodes per layer. We used the BNA with some regions removed
 
-weighted = False # We are now using MSTs matrices. Thus, the matrices are not weighted - if weighted, we should change it to True
+weighted = False # We are now using MST matrices. Matrices are thus not weighted - if weighted, change to True
 
 
-# We now should include the file for the supra adjacency matrixes here!!!
+# We now should include the file for the supra adjacency matrices here!!!
 
 # TRAINING RANDOM MATRIX
 filename = 'supra_randmst.mat'
@@ -72,7 +71,7 @@ filename = 'supra_randmst.mat'
 
 
 # Associating tags for each layer will be helpful for our coding. We used the ones below.
-# These are the tags for the Multilayer Networks - It should match the with the layers in the Supra Adjacency Matrix.
+# These are the tags for the Multilayer Networks - It should match with the layers in the supra-adjacency matrix.
  
 print('0 = fmri, 1 = pli delta, 2 = pli theta, 3 = pli alpha1, 4 = pli alpha2, 5 = pli beta, 6 = pli gamma, 7 = DWI .') 
 
@@ -122,7 +121,11 @@ print(type(Supra_MST))
 print(Supra_MST.keys())
 
 
-  
+
+###################################
+# PREPARING THE MULTILAYER        #
+###################################
+
 ###IMPROVEMENT - make it independent of the layer size!!!
   
 def Prepare_Multilayer(Data,list_of_layers,N=layer_size):
@@ -790,7 +793,7 @@ def SaveSPSS(Data, name, tag):
     ----------
     Data: The desired Data you want to save
     name: The name of the file you want to save
-    tag: The tag for the variable/collumn in your .csv file
+    tag: The tag for the variable/column in your .csv file
     """
     # Obs: Notice that if you want to get results only for a subnetwork, we should first do:
     #Data=Mask_subnetwork(result,target)
@@ -806,14 +809,14 @@ def SaveSPSS(Data, name, tag):
 def Function_output(function, Data, filename, colname, layers,N=layer_size):
     """Returns the desired output for the MumoBrain database, or any other database organized similarly
     
-    THIS IS PROBLABLY THE MOST IMPORTANT FUNCTION FOR THE USER OF THIS CODE, SINCE EVERYTHING WAS BUILD TO REACH THIS STAGE HERE
+    THIS IS PROBLABLY THE MOST IMPORTANT FUNCTION FOR THE USER OF THIS CODE, SINCE EVERYTHING WAS BUILT TO REACH THIS STAGE HERE
     
     Parameters
     ----------
     function: One of the functions developed in this code for Multilayer Networks
     Data: The Data we want to use: e.g., Supra_MST
-    filename: The name of the file you want to  save
-    colname: the name of the collumn tag in your file
+    filename: The name of the file you want to save
+    colname: the name of the column tag in your file
     layers: list of desired layers.
 
     """

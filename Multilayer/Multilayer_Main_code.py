@@ -123,8 +123,6 @@ print(supra_mst.keys())
 # PREPARING THE MULTILAYER        #
 ###################################
 
-
-
 def prepare_multilayer(data, list_of_layers, N=layer_size):
     """Converts the data to a Multinetx friendly object based on the inputed data.
     Parameters
@@ -492,9 +490,7 @@ def group_bet_centrality(data, list_of_single_layers):
     return flat_list
 
 
-############################################################################
-# These functions calculate mean and standard deviation of the measures    #
-############################################################################
+# The functions below calculate mean and standard deviation of the measures
     
 def group_eigenvector_centrality_mean(data, list_of_single_layers):
     """Returns a flat list with the aggregate output for group eigenvector centrality mean, given a data, and a list_of_single_layers
@@ -669,9 +665,9 @@ def group_degree_centrality_std(data, list_of_single_layers):
     return (group_degree_centrality_std)
 
 
-###########################
-# SOME PLOTTING FUNCTIONS # 
-###########################
+######################
+# PLOTTING FUNCTIONS # 
+######################
 
 def plot_group_ec(data, list_of_single_layers):
     """Returns a histogram plot with the values of the Eigenvalue centrality for all nodes across all individuals."

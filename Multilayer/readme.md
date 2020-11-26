@@ -1,20 +1,20 @@
 # Multilayer_Main_code.py - readme
 This readme explains how to use the main multilayer code used in the MULTINET lab. This script is used to calculate a multitude of multilayer network metrics: it takes supra-adjacency matrices as input, converts them to multiNetX objects, and defines multiple functions to compute multilayer measures. As most of the code is based on multiNetX, see also the [multiNetX github repository](https://github.com/nkoub/multinetx "multiNetX github repository").
 
-Note that most of the code can be executed without any input or modification. If you're only looking to calculate some network measures on  either the provided random data or your own multilayer dataset, please see the sections [Settings](#Settings "Goto Settings") through [Sanity check](#Sanity check "Goto Sanity check") and [Function_output](#Function_output "Goto Function_output").
+Note that most of the code can be executed without any input or modification. If you're only looking to calculate some network measures on  either the provided random data or your own multilayer dataset, please see the sections [Settings](#Settings "Goto Settings") through [Sanity check](#Sanity%20check "Goto Sanity check") and [Function_output](#Function_output "Goto Function_output").
 
 ##### Table of contents
-[Input file](#Input file "Goto Input file")
-[Required packages](# Required packages "Goto Required packages")
+[Input file](#Input%20file "Goto Input file")
+[Required packages](# Required%20packages "Goto Required packages")
 [Settings](#Settings "Goto Settings")
-[Creating layer tags](#Creating layer tags "Goto Creating layer tags")
-[Loading the matrices](#Loading the matrices "Goto Loading the matrices")
-[Sanity check](#Sanity check "Goto Sanity check")
-[Preparing the multilayer](#Preparing the multilayer "Goto Preparing the multilayer")
-[Creating the aggregate](#Creating the aggregate "Goto Creating the aggregate")
-[Multilayer functions](#Multilayer functions "Goto Multilayer functions")
-[Plotting functions](#Plotting functions "Goto Plotting functions")
-[Other functions](#Other functions "Goto Other functions")
+[Creating layer tags](#Creating%20layer%20tags "Goto Creating layer tags")
+[Loading the matrices](#Loading%20the%20matrices "Goto Loading the matrices")
+[Sanity check](#Sanity%20check "Goto Sanity check")
+[Preparing the multilayer](#Preparing%20the%20multilayer "Goto Preparing the multilayer")
+[Creating the aggregate](#Creating%20the%20aggregate "Goto Creating the aggregate")
+[Multilayer functions](#Multilayer%20functions "Goto Multilayer functions")
+[Plotting functions](#Plotting%20functions "Goto Plotting functions")
+[Other functions](#Other%20functions "Goto Other functions")
 [Function_output](#Function_output "Goto Function_output")
 
 ### Input file
@@ -55,7 +55,7 @@ A quick check to ensure data is loaded correctly. Note that this is not an autom
 The two functions defined here (*Prepare_Multilayer* and *multlayerG*) convert the input data from a Matlab file to a Multinetx friendly object. These functions are used in all the functions for computation of multilayer network measures that are defined later in this code, and do not need any user input.
 
 ### Creating the aggregate
-This function calculates an aggregate output from nodal multilayer metrics to ensure one value per multilayer node. The aggregate used is the mean of the value of a network property per node in each layer, and is the same method as is used in MuxViz (see [muxviz.net]).
+This function calculates an aggregate output from nodal multilayer metrics to ensure one value per multilayer node. The aggregate used is the mean of the value of a network property per node in each layer, and is the same method as is used in MuxViz (see [https://github.com/manlius/muxViz]).
 
 ### Multilayer functions
 In this section, a multitude of functions for the calculation of multilayer network metrics are defined. A more in-depth description of these functions as well as their required input and output can be found in each functions' docstrings. Briefly, the following functions are defined:
@@ -83,7 +83,7 @@ Plot_EC | Histogram of nodal eigenvector centrality of a single subject
 ### Other functions
 *Mask_subnetwork* can be used to extract specific nodes from a previously calculated list of network measures (e.g. nodes from the FPN or DMN). *SaveSPSS* saves specified data (i.e. a list of values) to a .csv file for further analysis.
 
-#### Function_output
+### Function_output
 This final function, *Function_output*, is the only function that is needed to calculate any of the multilayer network measures described above. It takes five input parameters (described below) and outputs a .csv file containing the desired multilayer network metric.
 Input parameter | Description
 --------------- | --------------

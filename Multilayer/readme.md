@@ -1,8 +1,26 @@
-# Multilayer_Main_code.py 
-This script is used to calculate a multitude of multilayer network metrics. It takes supra-adjacency matrices (of shape regions*layers x regions*layers x subjects, saved in a matlab _.mat_ file) as input, converts them to MultinetX objects, and defines several functions to compute multilayer measures.
+# Multilayer_Main_code.py - readme
+This readme explains how to use the main multilayer code used in the MULTINET lab. This script is used to calculate a multitude of multilayer network metrics: it takes supra-adjacency matrices as input, converts them to multiNetX objects, and defines multiple functions to compute multilayer measures. As most of the code is based on multiNetX, see also the [multiNetX github repository](https://github.com/nkoub/multinetx "multiNetX github repository").
 
-The following functions are used in the script:
+Note that most of the code can be executed without any input or modification. If you're only looking to calculate some network measures on  either the provided random data or your own multilayer dataset, please see the sections [Settings](#Settings "Goto Settings") through [Sanity check](#Sanity check "Goto Sanity check") and [Function_output](#Function_output "Goto Function_output").
 
+##### Table of contents
+[Input file](#Input file "Goto Input file")
+[Required packages](# Required packages "Goto Required packages")
+[Settings](#Settings "Goto Settings")
+[Creating layer tags](#Creating layer tags "Goto Creating layer tags")
+[Loading the matrices](#Loading the matrices "Goto Loading the matrices")
+[Sanity check](#Sanity check "Goto Sanity check")
+[Preparing the multilayer](#Preparing the multilayer "Goto Preparing the multilayer")
+[Creating the aggregate](#Creating the aggregate "Goto Creating the aggregate")
+[Multilayer functions](#Multilayer functions "Goto Multilayer functions")
+[Plotting functions](#Plotting functions "Goto Plotting functions")
+[Other functions](#Other functions "Goto Other functions")
+[Function_output](#Function_output "Goto Function_output")
+
+### Input file
+As some of the pre-processing of our data was performed using MATLAB and we also constructed our connectivity matrices in MATLAB, this code expects a supra-adjacency matrix of shape regions\*layers x regions\*layers x subjects, saved in a MATLAB _.mat_ file.
+
+### Required packages
 __Standard imports:__
 * itertools
 * multiprocessing _from_ Pool
@@ -31,7 +49,7 @@ The layer tags created here are used throughout the code to identify the individ
 The matlab supra-adjacency matrix specified in __Settings__ is loaded.
 
 ### Sanity check
-A quick check to ensure data is loaded correctly. Data should be of class 'dict'.
+A quick check to ensure data is loaded correctly. Note that this is not an automatic process: the output should be checked explicitly. Data should be of class 'dict', and the keys of the dictionary should correspond with the layer tags you created in the previous step.
 
 ### Preparing the multilayer
 The two functions defined here (*Prepare_Multilayer* and *multlayerG*) convert the input data from a Matlab file to a Multinetx friendly object. These functions are used in all the functions for computation of multilayer network measures that are defined later in this code, and do not need any user input.

@@ -4,20 +4,22 @@ This readme explains how to use the main multilayer code used in the MULTINET la
 The script consists of three sections. In the first section, the required packages as well as the data are loaded and a quick sanity check is performed. All necessary functions for multilayer analyses are defined in the second section. Finally, in the third section, you will find the main function *function_output* that can be used to calculate any of the multilayer network measures. Note that the majority of the code (i.e. the entirety of Section 2) can thus be executed without any input or modification: if you're only looking to calculate some network measures on  either the provided random data or your own multilayer dataset, please see [Section 1](#section-1:-setting-things-up "Goto Section 1") and [Section 3](#section-3:-calculating-multilayer-metrics") for instructions on how to do so.
 
 ##### Table of contents
-[Section 1: Setting things up](#section-1:-setting-things-up "Goto Section 1")
+[Section 1: Setting things up](#section-1-setting-things-up "Goto Section 1")
   * [Input file](#input-file "Goto Input file")  
   * [Required packages](#required-packages "Goto Required packages")  
   * [Settings](#settings "Goto Settings")  
   * [Creating layer tags](#creating-layer-tags "Goto Creating layer tags")  
   * [Loading the matrices](#loading-the-matrices "Goto Loading the matrices")  
   * [Sanity check](#sanity-check "Goto Sanity check")  
-[Section 2: Defining the functions](#section-2:-defining-the-functions "Goto Section 2")
+
+[Section 2: Defining the functions](#section-2-defining-the-functions "Goto Section 2")
   * [Preparing the multilayer](#preparing-the-multilayer "Goto Preparing the multilayer")  
   * [Creating the aggregate](#creating-the-aggregate "Goto Creating the aggregate")  
   * [Multilayer functions](#multilayer-functions "Goto Multilayer functions")  
   * [Plotting functions](#plotting-functions "Goto Plotting functions")  
   * [Other functions](#other-functions "Goto Other functions")  
-[Section 3: Calculating multilayer metrics](#section-3:-calculating-multilayer-metrics")
+
+[Section 3: Calculating multilayer metrics](#section-3-calculating-multilayer-metrics")
   * [Function_output](#function_output "Goto Function_output")  
 
 ## Section 1: Setting things up
@@ -25,12 +27,12 @@ The script consists of three sections. In the first section, the required packag
 As some of the pre-processing of our data was performed using MATLAB and we also constructed our connectivity matrices in MATLAB, this code expects a supra-adjacency matrix of shape regions\*layers *by* regions\*layers *by* subjects, saved in a MATLAB _.mat_ file.
 
 ### Required packages
-#####Standard imports
+##### Standard imports
 * itertools
 * multiprocessing _from_ Pool
 * time
 
-#####Third party imports
+##### Third party imports
 * matplotlib.pyplot _version 3.1.1_
 * multinetx
 * networkx _version 2.3_

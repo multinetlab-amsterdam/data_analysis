@@ -4,18 +4,18 @@ This readme explains how to use the main multilayer code used in the MULTINET la
 Note that most of the code can be executed without any input or modification. If you're only looking to calculate some network measures on  either the provided random data or your own multilayer dataset, please see the sections [Settings](#Settings "Goto Settings") through [Sanity check](#Sanity%20check "Goto Sanity check") and [Function_output](#Function_output "Goto Function_output").
 
 ##### Table of contents
-[Input file](#Input%20file "Goto Input file")
-[Required packages](# Required%20packages "Goto Required packages")
-[Settings](#Settings "Goto Settings")
-[Creating layer tags](#Creating%20layer%20tags "Goto Creating layer tags")
-[Loading the matrices](#Loading%20the%20matrices "Goto Loading the matrices")
-[Sanity check](#Sanity%20check "Goto Sanity check")
-[Preparing the multilayer](#Preparing%20the%20multilayer "Goto Preparing the multilayer")
-[Creating the aggregate](#Creating%20the%20aggregate "Goto Creating the aggregate")
-[Multilayer functions](#Multilayer%20functions "Goto Multilayer functions")
-[Plotting functions](#Plotting%20functions "Goto Plotting functions")
-[Other functions](#Other%20functions "Goto Other functions")
-[Function_output](#Function_output "Goto Function_output")
+[Input file](#Input%20file "Goto Input file")  
+[Required packages](#Required%20packages "Goto Required packages")  
+[Settings](#Settings "Goto Settings")  
+[Creating layer tags](#Creating%20layer%20tags "Goto Creating layer tags")  
+[Loading the matrices](#Loading%20the%20matrices "Goto Loading the matrices")  
+[Sanity check](#Sanity%20check "Goto Sanity check")  
+[Preparing the multilayer](#Preparing%20the%20multilayer "Goto Preparing the multilayer")  
+[Creating the aggregate](#Creating%20the%20aggregate "Goto Creating the aggregate")  
+[Multilayer functions](#Multilayer%20functions "Goto Multilayer functions")  
+[Plotting functions](#Plotting%20functions "Goto Plotting functions")  
+[Other functions](#Other%20functions "Goto Other functions")  
+[Function_output](#Function_output "Goto Function_output")  
 
 ### Input file
 As some of the pre-processing of our data was performed using MATLAB and we also constructed our connectivity matrices in MATLAB, this code expects a supra-adjacency matrix of shape regions\*layers x regions\*layers x subjects, saved in a MATLAB _.mat_ file.

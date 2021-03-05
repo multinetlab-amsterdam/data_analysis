@@ -100,7 +100,7 @@ def find_paths(main_dir, subject, extension, **kwargs):
                subject='mumo_002',
                extension='.asc',
                key1='OD1',
-               selection= ['Tr01'])
+               selection=['Tr01'])
     
     Returns
     -------
@@ -127,6 +127,9 @@ def find_paths(main_dir, subject, extension, **kwargs):
                             recursive=True)
     updatedfilter = firstfilter
     print('\n..............NaN keys will be printed.................')
+    start = None
+    end = None
+    selection = None
     for key, value in kwargs.items():
         # In case the key value is NaN (possible in subjects dataframe)
         if not isinstance(value,list) and pd.isnull(value):
@@ -354,9 +357,9 @@ def run_loop_powerspectrum(subject_list, extension='.asc',
     freq = np.empty([len(subjects), int(window_length/2+1)]) 
     for index, row in subjects.iterrows():
         print('\n\n//////////// Subject ' + str(index) + ' on subject_list ////////////')
-        files_list = find_paths(row['Path'], 
-                                row['Case_ID'],
-                                extension,
+        files_list = find_paths(main_dir=row['Path'], 
+                                subject=row['Case_ID'],
+                                extension=extension,
                                 timepoint=row['MM'], 
                                 atlas=row['Atlas'],
                                 start=row['Start'], 
@@ -414,11 +417,11 @@ def run_loop_powerspectrum(subject_list, extension='.asc',
 # Settings                #   
 ###########################
 # set nice level to 10, especially FOOOF algorithm is heavy!
-#os.nice(10)
+os.nice(10)
 
 # 1. Create correctly your list of subjects you want to process
 # an example is given here: 'example_MEG_list.csv'
-subject_list = 'path/to/example_MEG_alternative.csv'
+subject_list = '/path/to/example_MEG_alternative.csv'
 
 # 2. Define the type of file extension your are looking for
 extension = '.asc' # extension type
@@ -436,13 +439,13 @@ Fs = 1250 # sample frequency
 freq_range=[0.5, 48] # frequency range you want to analyze
 
 # 6. Give output directory
-dir_output = 'path/to/your/folder/'
+dir_output = '/path/to/output/folder/'
 
 # 7. Do you want to see the plots?
 plot_choice = False
 
 # 7a. Do you want to save the output? 
-save_output = True # you can save output
+save_output = False # you can save output
 
 ###########################
 # Run analysis            # 

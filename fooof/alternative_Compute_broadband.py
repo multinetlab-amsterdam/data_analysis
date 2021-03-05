@@ -195,7 +195,7 @@ def find_paths(main_dir, subject, extension, **kwargs):
     return updatedfilter
 
 
-def cal_power_spectrum (timeseries, nr_rois=np.arange(92), fs=1250, 
+def cal_power_spectrum(timeseries, nr_rois=np.arange(92), fs=1250, 
             window='hamming', nperseg=4096, scaling='spectrum', 
             plot_figure=False, title_plot='average power spectrum'):
     """ Calculate (and plot) power spectrum of timeseries
@@ -233,11 +233,11 @@ def cal_power_spectrum (timeseries, nr_rois=np.arange(92), fs=1250,
   
     pxx = np.empty([int(nperseg/2+1), np.size(nr_rois)])
     
-    i=0
+    i = 0
     for roi in nr_rois:
         (f, pxx[:,i]) = signal.welch(timeseries[roi].values, fs, window, 
                                      nperseg, scaling=scaling)
-        i=i+1
+        i = i + 1
     if plot_figure==True:
         plt.figure()
         plt.plot(f, np.mean(pxx,1), color='teal')
@@ -390,7 +390,7 @@ def run_loop_powerspectrum(subject_list, extension='.asc',
             #broadband_power[index,:] = 'nan'
             for file, name in zip(range(len(files_list)),files_list):
                 location = name.rfind('Tr')
-                timeseries =pd.read_csv(files_list[file], index_col=False, 
+                timeseries = pd.read_csv(files_list[file], index_col=False, 
                                 header=None, delimiter='\t')
                 # Compute power spectrum
                 f, pxx = cal_power_spectrum(timeseries, nr_rois=nr_rois, fs=Fs, 
@@ -414,18 +414,18 @@ def run_loop_powerspectrum(subject_list, extension='.asc',
 # Settings                #   
 ###########################
 # set nice level to 10, especially FOOOF algorithm is heavy!
-os.nice(10)
+#os.nice(10)
 
 # 1. Create correctly your list of subjects you want to process
 # an example is given here: 'example_MEG_list.csv'
-subject_list = 'example_MEG_alternative.csv'
+subject_list = 'path/to/example_MEG_alternative.csv'
 
 # 2. Define the type of file extension your are looking for
 extension = '.asc' # extension type
 
 # 3. Select which roi or rois you want to analyze
 # if you want to analyze 1 roi, specify its number (nr_rois = (10,))
-nr_rois = [0,1]#(10,) if only run for roi 11 # note that python indexes at 0!
+nr_rois = [0,5,9]#(10,) if only run for roi 11 # note that python indexes at 0!
 # if you want to analyze multiple rois, create list with these rois
 # (for example nr_rois = np.arange(78) for all 78 cortical AAL rois)
 
@@ -436,10 +436,13 @@ Fs = 1250 # sample frequency
 freq_range=[0.5, 48] # frequency range you want to analyze
 
 # 6. Give output directory
-dir_output = '/data/KNW/e.centeno/'
+dir_output = 'path/to/your/folder/'
+
+# 7. Do you want to see the plots?
+plot_choice = False
 
 # 7a. Do you want to save the output? 
-save_output = False # you can save output
+save_output = True # you can save output
 
 ###########################
 # Run analysis            # 
@@ -451,7 +454,7 @@ save_output = False # you can save output
 # of the power spectrum (can be useful when plotting power spectrum)
 mean_pxx, broadband_power, f = run_loop_powerspectrum(subject_list, 
                    extension, nr_rois=nr_rois, Fs=Fs, 
-                   window_length=4096, freq_range=freq_range, plot_figure=True)
+                   window_length=4096, freq_range=freq_range, plot_figure=plot_choice)
 
 # save output
 if save_output == True:
@@ -503,9 +506,9 @@ for index, row in subjects.iterrows():
             offset[index,] = np.nan
             slope[index,] = np.nan
         else:
-            for roi in nr_rois:
+            for roi in np.arange(len(nr_rois)):
                 #roi-=1
-                print('roi : ' + str(roi))
+                print('roi : ' + str(nr_rois[roi]))
                 offset[index,roi], slope[index,roi] = cal_FOOOF_parameters(
                                                     mean_pxx[index,:,roi], 
                                                     f[index,:], freq_range=[0.5, 48])

@@ -36,7 +36,7 @@ def make_csv(csv_path, extension):
 
     #add start and stop epochs to df
     df['Start'] = np.repeat(1,len(df['Path']))
-    df['Stop'] = np.repeat(min_nr_epochs, len(df['Path']))
+    df['End'] = np.repeat(min_nr_epochs, len(df['Path']))
 
     #save new csv file that includes the epochs to analyse
     df.to_csv(csv_path)

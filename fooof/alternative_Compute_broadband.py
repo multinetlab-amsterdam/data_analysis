@@ -100,7 +100,7 @@ def find_paths(main_dir, subject, extension, **kwargs):
                subject='mumo_002',
                extension='.asc',
                key1='OD1',
-               selection=['Tr01'])
+               selection=['Tr01', 'Tr04'])
 
     Returns
     -------
@@ -147,7 +147,8 @@ def find_paths(main_dir, subject, extension, **kwargs):
         elif key == 'selection':
             if isinstance(value, list):
                 selection = value
-            elif isinstance(value,str):
+            elif isinstance(value, str):
+                selection = selection.replace((';',',')) # Step that convert ; to , (used in example.csv)
                 selection = ast.literal_eval(value)
             assert isinstance(selection, list), 'Argument should end up being a list of Tr numbers strings'
             assert all(isinstance(item, str) for item in selection), 'Argument must be a list of of Tr numbers strings'

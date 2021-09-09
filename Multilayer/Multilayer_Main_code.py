@@ -779,7 +779,7 @@ def save_csv(data, name, tag):
     #data=mask_subnetwork(result,target)
     #before saving this file
     cols = [tag]
-    df = pd.dataFrame(data, columns=cols)
+    df = pd.DataFrame(data, columns=cols)
     df.to_csv(name+'.csv')
     
     return

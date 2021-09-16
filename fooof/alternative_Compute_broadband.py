@@ -16,7 +16,7 @@ reference Github: https://fooof-tools.github.io/fooof/index.html
 __author__ = 'Tianne Numan'
 __contact__ = 't.numan@amsterdamumc.nl' # or l.douw@amsterdamumc.nl
 __date__ = '2020/09/14'   ### Date it was created
-__status__ = 'Production'
+__status__ = 'Finished'
 
 
 ####################

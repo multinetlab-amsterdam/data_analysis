@@ -144,7 +144,10 @@ def prepare_multilayer(data, list_of_layers, N=layer_size):
     
     #In the matlab file the element [-1] gives the matrices
     name = list(data.keys())[-1]
-    multilayer = data[name]
+    if len(data[name].shape)==2:
+        multilayer=np.expand_dims(data[name], axis=0).T
+    else:
+        multilayer = data[name]
 
     # Just checking if there are NaNs
     where_are_NaNs = np.isnan(multilayer)
@@ -271,8 +274,11 @@ def group_eigenvector_centrality(data, list_of_single_layers):
 
     "This list will save all the eigenvector centralities for all individuals in all layers."
     name = list(data.keys())[-1]
-
-    number_of_individuals = data[name].shape[2]
+    #fixed it!!! 
+    if len(data[name].shape)==2:
+        number_of_individuals=1
+    else:
+        number_of_individuals = data[name].shape[2]
 
     group_eigenvector = []
     for individual in range(number_of_individuals):
@@ -311,8 +317,10 @@ def group_clustering(data, list_of_single_layers):
     """
     
     name = list(data.keys())[-1]
-
-    number_of_individuals = data[name].shape[2]
+    if len(data[name].shape)==2:
+        number_of_individuals=1
+    else:
+        number_of_individuals = data[name].shape[2]
 
     group_clustering = []
     for individual in range(number_of_individuals):
@@ -350,8 +358,10 @@ def group_degree_centrality(data, list_of_single_layers):
     """
     
     name = list(data.keys())[-1]
-
-    number_of_individuals = data[name].shape[2]
+    if len(data[name].shape)==2:
+        number_of_individuals=1
+    else:
+        number_of_individuals = data[name].shape[2]
 
     group_deg_centrality = []
     for individual in range(number_of_individuals):
@@ -391,8 +401,10 @@ def group_eccentricity(data, list_of_single_layers):
     """
     
     name = list(data.keys())[-1]
-
-    number_of_individuals = data[name].shape[2]
+    if len(data[name].shape)==2:
+        number_of_individuals=1
+    else:
+        number_of_individuals = data[name].shape[2]
 
     group_eccentricity = []
     for individual in range(number_of_individuals):
@@ -427,8 +439,10 @@ def non_norm_group_eccentricity(data, list_of_single_layers):
    
     """
     name = list(data.keys())[-1]
-
-    number_of_individuals = data[name].shape[2]
+    if len(data[name].shape)==2:
+        number_of_individuals=1
+    else:
+        number_of_individuals = data[name].shape[2]
 
     group_eccentricity = []
     for individual in range(number_of_individuals):
@@ -469,8 +483,10 @@ def group_bet_centrality(data, list_of_single_layers):
     """
     
     name = list(data.keys())[-1]
-
-    number_of_individuals = data[name].shape[2]
+    if len(data[name].shape)==2:
+        number_of_individuals=1
+    else:
+        number_of_individuals = data[name].shape[2]
 
     group_bet_centrality = []
     for individual in range(number_of_individuals):
@@ -513,8 +529,10 @@ def group_eigenvector_centrality_mean(data, list_of_single_layers):
     
     "This function returns the group eigenvector centrality mean for all individuals"
     name = list(data.keys())[-1]
-
-    number_of_individuals = data[name].shape[2]
+    if len(data[name].shape)==2:
+        number_of_individuals=1
+    else:
+        number_of_individuals = data[name].shape[2]
 
     group_eigenvector_mean = []
     for individual in range(number_of_individuals):
@@ -551,8 +569,11 @@ def group_eigenvector_centrality_std(data, list_of_single_layers):
     "This function returns the group eigenvector centrality standard deviation for all individuals"
     
     name = list(data.keys())[-1]
+    if len(data[name].shape)==2:
+        number_of_individuals=1
 
-    number_of_individuals = data[name].shape[2]
+    else:
+        number_of_individuals = data[name].shape[2]
     group_eigenvector_std = []
     for individual in range(number_of_individuals):
         temp = multilayer_g(individual, data, list_of_single_layers)
@@ -616,7 +637,10 @@ def group_degree_centrality_mean(data,list_of_single_layers):
     
      print('layers =',[layer_tags[i] for i in list_of_single_layers])
      name = list(data.keys())[-1]
-     number_of_individuals = data[name].shape[2]
+     if len(data[name].shape)==2:
+            number_of_individuals=1
+     else:
+        number_of_individuals = data[name].shape[2]
 
      "This list will save all the eigenvector centralities means for all individuals"
      group_degree_centrality_mean = []
@@ -651,7 +675,10 @@ def group_degree_centrality_std(data, list_of_single_layers):
     """
     print('layers =',[layer_tags[i] for i in list_of_single_layers])
     name = list(data.keys())[-1]
-    number_of_individuals = data[name].shape[2]
+    if len(data[name].shape)==2:
+        number_of_individuals=1
+    else:
+        number_of_individuals = data[name].shape[2]
     "This list will save all the eigenvector centralities means for all individuals"
     group_degree_centrality_std = []
     for individual in range(number_of_individuals):
@@ -810,3 +837,4 @@ def function_output(function, data, filename, colname, layers, N=layer_size):
     save_csv(temp_sub_net, filename, colname)
     
     return
+

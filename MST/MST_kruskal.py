@@ -1,7 +1,42 @@
-### Imports ###
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""Adaptation of the Kruskal algorithm to generate a maximum spanning tree. 
+
+   The Kruskal algorithm starts with ranking all connection weights from 
+   lowest to highest weight. Since we are interested in the strongest
+   connections, we ranked all connections from highest to lowest weight
+   (formally, our procedure therefore reconstructs the maximum spanning tree).
+   We start by disconnecting all nodes, and add the connection with the
+   highest weight. Next, the connection with the second highest weight is
+   added and this procedure is repeated until all nodes are connected.
+   If adding a new connection results in a cycle or loop, this connection is
+   discarded, and the next connection ranked by weight is selected.
+
+"""
+
+__author__ = "Mona Zimmermann"
+__contact__ = "m.l.m.zimmermann@amsterdamumc.nl"
+__date__ = "2021"   ### Date it was created
+__status__ = "Concluded" ### Production = still being developed. Else: Concluded/Finished.
+
+
+####################
+# Review History   #
+####################
+
+# Reviewed by Lucas Breedt 20210501
+# Reviewed by Bernardo Maciel 20220115
+
+
+####################
+# Libraries        #
+####################
+
+# Standard imports  #
+
+# Third party imports #
 import numpy as np
-import pandas as pd
-from collections import Counter
 from tqdm import tqdm
 
 

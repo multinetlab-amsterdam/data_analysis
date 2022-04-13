@@ -103,3 +103,6 @@ filename        | Determines name of file to be saved
 colname		| Determines column name in savefile
 layers		| List of layers to be included for calculation of multilayer measures
 
+OBS: When you run this final command, specialy in the server, make sure to indicate the path of the output file, otherwhise your may be lost in your computer.
+Example: function_output(group_eigenvector_centrality, supra_mst,'/path to your output/whole_multilayer_EC_mean', 'EC', list(range(6)))
+

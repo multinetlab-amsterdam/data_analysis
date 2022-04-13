@@ -89,7 +89,8 @@ plot_group_ec | Histogram of nodal eigenvector centrality across all subjects
 plot_ec | Histogram of nodal eigenvector centrality of a single subject
 
 ### Other functions
-The function *mask_subnetwork* extracts specific nodes from a previously calculated list of network measures (e.g. nodes from the FPN or DMN); *save_csv* saves data (i.e. a list values) to a .csv file for further analysis.
+The function *mask_subnetwork* extracts specific nodes from a previously calculated list of network measures (e.g. nodes from the FPN or DMN); *save_csv* saves data (i.e. a list values) to a .csv file for further analysis. 
+OBS: If you want to calculate a certain metric within a specific subnetwork (e.g. FPN), make sure to subtract the number of the regions by -1 since python starts at 0.
 
 ## Section 3: Calculating multilayer metrics
 ### Function_output

@@ -46,7 +46,8 @@ As some of the pre-processing of our data was performed using MATLAB and we also
 
 ### Settings
 Here, the input file and its attributes are defined. 
-Specify the number of regions/nodes per layer by changing *layer_size*, and specify whether data is weighted or unweighted by changing the value of *weighted*. Finally, specify the location of the input data under *filename*.
+Specify the number of regions/nodes per layer by changing *layer_size*, and specify whether data is weighted or unweighted by changing the value of *weighted*. Finally, specify the location of the input data under *filename*. 
+Example: supra_mst = scipy.io.loadmat('/path to your data/supra_mst_full.mat')
 
 ### Creating layer tags
 The layer tags created here are used throughout the code to identify the individual layers of the multilayer, and should thus match the ordering of the layers in the supra-adjacency matrix. Change accordingly. Obs: Notice that Python starts couting from zero, not one (like in other programs such as Matlab).
